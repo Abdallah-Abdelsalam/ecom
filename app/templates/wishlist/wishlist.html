@@ -107,6 +107,7 @@
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
+            min-width: 200px; /* Set a minimum width for the product card */
         }
     }
     .wishlisty{
@@ -126,6 +127,10 @@
                         <a href="{{i.product.get_absolute_url}}">
                             <img src={{i.product.featured_image.url}} alt="{{i.product.product_name}}">
                         </a>
+                        {% if i.product.total_quantity == 0 %}
+                            <span class="badge bg-danger position-absolute top-0 start-0 m-2" style="font-size: 0.75rem;">Out of Stock</span>
+                        {% endif %}
+                    
                         {% if i.product.discount %}
                             <span class="off">-{{i.product.discount}}%</span>
                         {% endif %}

@@ -107,6 +107,10 @@
         .row {
             grid-template-columns: repeat(2, 1fr); /* 2 products per row on mobile */
         }
+        .badgy{
+            font-size: 0.7rem; /* Adjust the font size of the badge */
+            bottom: 4rem; /* Adjust the position of the badge */
+        }
     }
 
     /* Desktop View */
@@ -117,6 +121,10 @@
 
         .col-md-7 {
             width: 20%; /* Sidebar filter (if needed) takes 20% width on larger screens */
+        }
+        .badgy{
+            font-size: 0.7rem; /* Adjust the font size of the badge */
+            bottom: 4rem; /* Adjust the position of the badge */
         }
     }
 
@@ -167,6 +175,9 @@
                         <a href="{{ i.get_absolute_url }}">
                             <img src="{{ i.featured_image.url }}" alt="{{ i.product_name }}">
                         </a>
+                        {% if i.total_quantity == 0 %}
+                            <span class="badgy badge bg-danger position-absolute start-0 m-2" style="font-size: 0.75rem;">Out of Stock</span>
+                        {% endif %}
                         {% if i.discount %}
                             <span class="off">-{{ i.discount }}%</span>
                         {% endif %}

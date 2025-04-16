@@ -95,6 +95,11 @@
         .product-price {
             font-size: 14px; /* Smaller font for mobile */
         }
+        .badgy{
+            font-size: 1.7rem; /* Adjust the font size of the badge */
+            bottom: 4.5rem; /* Adjust the position of the badge */
+            left: 0.5rem; /* Adjust the position of the badge */
+        }
     }
 
     /* Desktop View (large screens) */
@@ -106,6 +111,11 @@
 
         h1 {
             font-size: 1.8rem; /* Larger font size on desktop */
+        }
+        .badgy{
+            font-size: 1.7rem; /* Adjust the font size of the badge */
+            bottom: 4.5rem; /* Adjust the position of the badge */
+            left: 0.5rem; /* Adjust the position of the badge */
         }
     }    
     .breadcrumb-item a {
@@ -161,6 +171,9 @@
                         <a href="{{i.get_absolute_url}}">
                             <img src="{{i.featured_image.url}}" alt="{{i.product_name}}" class="img-fluid">
                         </a>
+                        {% if i.total_quantity == 0 %}
+                            <span class="badge badgy bg-danger position-absolute m-2" style="font-size: 0.75rem;">Out of Stock</span>
+                        {% endif %}
                         {% if i.discount %}
                             <span class="off">-{{i.discount}}%</span>
                         {% endif %}

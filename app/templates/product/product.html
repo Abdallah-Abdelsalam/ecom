@@ -224,7 +224,10 @@
                         </a>
                     
                         {% if product_item.product.total_quantity == 0 %}
-                            <span class="badge bg-danger position-absolute top-0 end-0 m-2" style="font-size: 0.75rem;">Out of Stock</span>
+                        <span class="badge bg-danger position-absolute bottom-0 end-0 m-2" style="font-size: 0.75rem;">
+                            Out of Stock
+                        </span>
+                        
                         {% endif %}
                     
                         {% if product_item.product.discount %}
@@ -326,7 +329,7 @@
                         </a>
                     
                         {% if i.product.total_quantity == 0 %}
-                            <span class="badge bg-danger position-absolute top-0 end-0 m-2" style="font-size: 0.75rem;">Out of Stock</span>
+                            <span class="badge bg-danger position-absolute bottom-0 end-0 m-2" style="font-size: 0.75rem;">Out of Stock</span>
                         {% endif %}
                     
                         {% if i.product.discount %}
