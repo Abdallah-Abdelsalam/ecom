@@ -1,0 +1,189 @@
+{% extends 'app/base.html' %}
+{% load product_tags %}
+
+{% block content %}
+<style>
+
+    /* Product Card and Wishlist Heart Icon Styles */
+    .product-card {
+        border: none; /* Removed border */
+        border-radius: 10px;
+        padding: 10px;
+        margin-bottom: 20px;
+        transition: transform 0.3s ease;
+        position: relative; /* Allow positioning of the wishlist heart icon */
+        box-shadow: none; /* Removed shadow to have no frame */
+    }
+
+    /* Wishlist Heart Button - Top Left */
+    .wishlist-btn {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background-color: white;
+        border: 2px solid #ddd;
+        color: #000;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .wishlist-btn:hover {
+        background-color: #FFD700; /* Gold color on hover */
+        border-color: #FFD700; /* Gold border on hover */
+    }
+
+    .off {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: #DF9755;
+        color: white;
+        padding: 5px;
+        border-radius: 5px;
+    }
+
+    .product-price {
+        font-size: 16px;
+        font-weight: 700;
+        color: #DF9755;
+        text-align: center;
+    }
+
+    /* Grid layout adjustments for products */
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr); /* Default to 4 products per row */
+        gap: 15px; /* Adjust the spacing between products */
+        width: 100%;
+    }
+
+    .product-card {
+        width: 100%; /* Ensure each product card takes full width within the grid */
+    }
+
+    /* Mobile View */
+    @media (max-width: 991px) {
+        /* Grid for smaller screens (2 products per row) */
+        .product-grid {
+            grid-template-columns: repeat(2, 1fr); /* 2 products per row on mobile */
+        }
+
+        .product-card {
+            margin-bottom: 1.5rem; /* Remove margin for a clean layout */
+        }
+    }
+
+    /* Tablet View (for medium screens) */
+    @media (max-width: 767px) {
+        /* Grid for smaller screens (1 product per row) */
+        .product-grid {
+            grid-template-columns: 1fr; /* 1 product per row on tablet and below */
+        }
+
+        h1 {
+            font-size: 1.3rem; /* Adjust the heading size for mobile */
+            padding: 15px 0; /* Adjust padding for mobile */
+        }
+
+        .product-price {
+            font-size: 14px; /* Smaller font for mobile */
+        }
+    }
+
+    /* Desktop View (large screens) */
+    @media (min-width: 992px) {
+        /* Keep the grid with 4 items per row */
+        .product-grid {
+            grid-template-columns: repeat(4, 1fr); /* 4 products per row */
+        }
+
+        h1 {
+            font-size: 1.8rem; /* Larger font size on desktop */
+        }
+    }    
+    .breadcrumb-item a {
+        text-decoration: none;
+        color: #007bff;
+    }
+    
+    .breadcrumb-item a:hover {
+        text-decoration: underline;
+    }
+    .category-detail-title {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #333;
+    }
+    .category-detail-title.text-center::after {
+        content: '';
+        display: block;
+        width: 50px;
+        height: 4px;
+        background-color: #DF9755; /* Color for the underline */
+        margin: 10px auto; /* Center the underline */
+    }
+    .montserrat-prod {
+        font-family: "Montserrat", sans-serif;
+        font-optical-sizing: auto;
+        font-weight: 400;
+        font-style: normal;
+        }
+
+</style>
+<div class="mt-2 mx-3">
+    <!-- Breadcrumb Section -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item jost-nav"><a href="/">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page"></li>
+        </ol>
+    </nav>
+</div>
+<div class="mx-3">
+    <h1 class="category-detail-title text-center jost-navy">{{ brand.name }}</h1>
+</div>
+
+
+{% if products %}
+    <div class="col-md-12 mb-5">
+        <div class="product-grid" id="product-list">
+            <!-- Loop through products -->
+            {% for i in products %}
+                <div class="product-card" data-category="{{i.main_categorys}}" data-brand="{{i.categories}}" data-color="{{i.color}}" data-price="{% call_sellprice i.price i.discount %}">
+                    <div class="product-image">
+                        <a href="{{i.get_absolute_url}}">
+                            <img src="{{i.featured_image.url}}" alt="{{i.product_name}}" class="img-fluid">
+                        </a>
+                        {% if i.discount %}
+                            <span class="off">-{{i.discount}}%</span>
+                        {% endif %}
+
+                        <!-- Wishlist Heart Icon (Top Left) -->
+                        <div class="wishlist-btn">
+                            <a href="{% url 'add_to_wishlist' i.id %}"><i class="fa-regular fa-heart text-dark"></i></a>
+                        </div>
+                    </div>
+
+                    <h5 class="text-center mt-2 dm-sans">{{i.product_name}}</h5>
+                    <div class="product-price text-center">
+                        {% call_sellprice i.price i.discount %} EGP &nbsp;
+                        {% if i.discount %}
+                            <del class="text-secondary dm-sans">{{i.price}} EGP</del>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% else %}
+    <p>No products available for this brand.</p>
+{% endif %}
+
+{% endblock %}

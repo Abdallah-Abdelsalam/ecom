@@ -1,0 +1,136 @@
+{% extends 'app/base.html'%}
+
+{% block content %}
+<style>
+    /* General Styles */
+
+h/* Modern Header Styling */
+h1 {
+    font-size: 2.5rem;  /* Larger font size for a more prominent header */
+    color: #ffffff;  /* White text color */
+    text-align: center;
+    padding: 40px 20px;  /* More padding for spacious feel */
+    background: linear-gradient(135deg, #2c3e50, #4ca1af);  /* Gradient background for depth */
+    border-radius: 12px;  /* Rounded corners */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);  /* Subtle shadow for 3D effect */
+    letter-spacing: 1px;  /* Increased letter spacing for a more modern feel */
+    text-transform: uppercase;  /* Uppercase letters for a stronger look */
+    transition: transform 0.3s ease;  /* Smooth transition for hover effect */
+    margin-bottom: 4rem;  /* Space below the header */
+
+}
+/* Optional: Responsive Typography for Header */
+@media screen and (max-width: 767px) {
+    h1 {
+        font-size: 2rem;  /* Slightly smaller font on mobile */
+        padding: 30px 15px;  /* Adjust padding for mobile */
+    }
+}
+
+/* Brand List Container */
+.brand-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Default: 2 brands per row */
+    gap: 20px;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Individual Brand Item */
+.brand-item {
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    transition: transform 0.3s ease;
+}
+
+.brand-item:hover {
+    transform: translateY(-5px);
+}
+
+/* Brand Name Styles */
+.brand-item h2 {
+    font-size: 1.4rem;
+    color: #333;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.brand-item h2 a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.brand-item p {
+    font-size: 1rem;
+    color: #555;
+    text-align: center;
+    line-height: 1.5;
+}
+
+/* Brand Logo */
+.brand-item img {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 15px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Responsive Styles */
+
+/* Mobile view - 2 brands per row */
+@media screen and (max-width: 767px) {
+    .brand-list {
+        grid-template-columns: repeat(2, 1fr); /* 2 items per row */
+        margin-bottom: 3rem; /* Bottom margin for spacing */
+    }
+    .brand-item {
+        height: 100%; /* Ensures consistent item height on mobile */
+    }
+}
+
+/* Tablet view - 2-3 brands per row */
+@media screen and (min-width: 768px) and (max-width: 1024px) {
+    .brand-list {
+        grid-template-columns: repeat(3, 1fr); /* 3 items per row */
+    }
+}
+
+/* Desktop view - 4 brands per row */
+@media screen and (min-width: 1025px) {
+    .brand-list {
+        grid-template-columns: repeat(4, 1fr); /* 4 items per row */
+        margin-bottom: 3rem; /* Bottom margin for spacing */
+    }
+    .brand-item {
+        height: 100%; /* Ensures consistent item height on desktop */
+    }
+}
+
+
+</style>
+<div class="text-center text-md-start mb-3 ms-md-5 mt-3 mx-2">
+    <h1>Available Brands</h1>
+</div>
+<div class="brand-list">
+    {% for brand in brands %}
+        <div class="brand-item">
+            <h2><a href="{% url 'brand_detail' brand.id %}">{{ brand.name }}</h2>
+            {% if brand.logo %}
+                <img src="{{ brand.logo.url }}" alt="{{ brand.name }} Logo"></a>
+            {% endif %}
+            <p>{{ brand.description }}</p>
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

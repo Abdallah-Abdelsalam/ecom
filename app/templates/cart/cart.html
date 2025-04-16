@@ -1,0 +1,303 @@
+{% extends 'app/base.html'%}
+
+{% load static %}
+{% load cart_tag %}
+{% block content %}
+<style>
+    /* Apply Poppins font globally */
+    body {
+        font-family: 'Poppins', sans-serif;
+    }
+
+    /* Apply font to headings */
+    h2, h5, .card-title {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+    }
+
+    /* Apply font to paragraph and text */
+    p, span, .empty-cart-message p {
+        font-family: 'Poppins', sans-serif;
+    }
+
+    /* For buttons */
+    .btn, .btn-primary, .btn-success {
+        font-family: 'Poppins', sans-serif;
+    }
+
+    /* Custom Styles */
+    .number-input {
+        display: flex;
+        align-items: center;
+    }
+
+    .number-input button {
+        width: 30px;
+        height: 30px;
+        border: 1px solid #ccc;
+        background-color: #f9f9f9;
+        cursor: pointer;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .a-input a:hover {
+        background-color: #e9e9e9;
+    }
+
+    .number-input input {
+        text-align: center;
+        margin: 0 5px;
+    }
+
+    .number-input input::-webkit-outer-spin-button,
+    .number-input input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    @media only screen and (max-width: 700px) {
+        .card {
+            margin-top: 20px;
+        }
+    }
+
+    a.disabled-link {
+        pointer-events: none;
+        opacity: 0.5;
+    }
+
+    .empty-cart-message {
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .empty-cart-message h2 {
+        font-weight: bold;
+        font-size: 24px;
+    }
+
+    .empty-cart-message p {
+        font-size: 18px;
+        color: #666;
+    }
+
+    .empty-cart-message button {
+        width: 150px;
+        height: 40px;
+        font-size: 16px;
+        border-radius: 10px;
+        background-color: #DF9755;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+    }
+
+    .empty-cart-message button:hover {
+        background-color: #FFD65A;
+    }
+</style>
+<div class="container mt-5">
+    <!-- Cart Heading -->
+    <div class="col-12">
+        {% if cart.items %}
+            <h2 class="text-center">Your Shopping Cart</h2>
+        {% endif %}
+    </div>
+        <!-- Check if Cart is Empty -->
+        {% if request.session.cart|length == 0 %}
+        <!-- Show Empty Cart Message -->
+        <div class="col-12 mt-4 text-center">
+            <div class="empty-cart-message">
+                <h2 class="mb-3">Your cart is empty</h2>
+                <p>Start shopping now and discover our latest deals!</p>
+                <a href="{% url 'product' %}">
+                    <button class="btn btn-primary mt-3">Start Shopping</button>
+                </a>
+            </div>
+        </div>
+        {% else %}
+        <!-- Cart Items Section -->
+        <div class="col-12 col-md-7 mt-4">
+            <div class="list-group w-100">
+                <!-- Single Product -->
+                {% for key, value in request.session.cart.items %}
+                <div class="list-group-item d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3 position-relative">
+                    <div class="d-flex align-items-center">
+                        <!-- Product Image -->
+                        <img src="{{ value.featured_image }}" alt="Product Image" class="img-fluid me-3" style="width: 80px;">
+
+                        <div>
+                            <!-- Product Name -->
+                            <h5 class="mb-1">{{ value.product_name }}</h5>
+                            <!-- Product Price (Reflect variation price) -->
+                            <p class="mb-0">EGP {{ value.price | multiply:value.quantity }}</p>
+
+                            <!-- Display the selected size (or variation) -->
+                            {% if value.selected_size %}
+                            <p class="mb-0 text-muted">Size: {{ value.selected_size }}</p> <!-- Display size -->
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Quantity & Price -->
+                    <div class="d-flex align-items-center mt-3 mt-md-3">
+                        <div class="number-input d-flex align-items-center">
+                            <!-- Decrement Button -->
+                            <a href="{% if value.product_id %}{% url 'item_decrement' value.product_id %}{% else %}# {% endif %}" 
+                                class="{% if value.quantity == 1 %}disabled-link{% endif %}" style="text-decoration:none;">
+                                <button class="minus-btn btn btn-outline-secondary" onclick="decrementValue()" {% if value.quantity == 1 %}disabled{% endif %}>-</button>
+                            </a>
+
+                            <!-- Quantity Input Field -->
+                            <input type="number" class="form-control mx-2" value="{{ value.quantity }}" min="1" id="numberInput" style="width: 50px;">
+
+                            <!-- Increment Button -->
+                            <a href="{% if value.product_id %}{% url 'item_increment' value.product_id %}{% else %}# {% endif %}" style="text-decoration:none;">
+                                <button class="plus-btn btn btn-outline-secondary" onclick="incrementValue()">+</button>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Clear Button (Remove Item) -->
+                    <div class="d-flex align-items-center mt-3 mt-md-0 position-absolute top-0 end-0">
+                        <!-- Trash Icon for Clearing Specific Item -->
+                        <a href="{% if value.variation_id %}
+                                    {% url 'item_clear' value.product_id value.variation_id %}
+                                    {% else %}
+                                    {% url 'item_clear' value.product_id %}
+                                    {% endif %}" 
+                        class="btn btn-sm d-flex align-items-center me-2">
+                            <i class="fa fa-trash text-dark" aria-hidden="true"></i> <!-- Trash icon -->
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Cart Summary Section (Only visible if the cart is not empty) -->
+        <div class="col-12 col-md-4 mt-4 mt-md-0">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Cart Summary</h5>
+                    <!-- Sub Total and Total Price -->
+                    <div class="d-flex justify-content-between">
+                        <span>Sub Total:</span>
+                        <span id="total-price">EGP {{ cart_total_price }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Tax:</span>
+                        <span id="total-price">EGP {{ tax }}</span>
+                    </div>
+                    <!-- Coupon Code -->
+                    {% if valid_coupon %}
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>Coupon Code:</span>
+                        <span>{{ coupon_code }}</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>Coupon Discount:</span>
+                        <span class="text-success">-EGP {{ discount_amount }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Shipping Fee (50 if under 1000, Free if over 1000) -->
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>Shipping:</span>
+                        {% if cart_total_price > 1000 %}
+                        <span class="text-success">Free</span>
+                        {% else %}
+                        <span>EGP 50</span>
+                        {% endif %}
+                    </div>
+        
+                    <!-- Total Calculation -->
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between align-items-center total">
+                            <span>Total:</span>
+                            <span type="submit">EGP {{ final_total }}</span>
+                        </div>
+                    </form>
+        
+                    <!-- Coupon Code Section -->
+                    <div class="mt-3">
+                        <label for="coupon-code" class="form-label">Coupon Code</label>
+                        <form method="get">
+                            {% if valid_coupon %}
+                            <div class="alert alert-success" role="alert">
+                                Valid Coupon Code! Enjoy Your Offer
+                            </div>
+                            {% elif invalid_coupon %}
+                            <div class="alert alert-danger" role="alert">
+                                Invalid Coupon Code! :(
+                            </div>
+                            {% endif %}
+                            
+                            <input type="text" id="coupon-code" class="form-control" placeholder="Enter your coupon" name="coupon_code">
+                            <button class="btn btn-primary mt-2" type="submit" style="background-color:#3A7D44; border:none;">Apply</button>
+                        </form>
+                    </div>
+        
+                    <!-- Payment Method Section -->
+                    <div class="mt-4">
+                        <h6>Payment Method</h6>
+                        <!-- Cash on Delivery Option -->
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" id="payment-cod" name="payment-method" value="cash_on_delivery" checked disabled>
+                            <label class="form-check-label" for="payment-cod">
+                                Cash on Delivery
+                            </label>
+                        </div>
+                    </div>
+        
+                    <!-- Checkout Button -->
+                    <div class="mt-4">
+                        <a href="{% url 'checkout' %}" class="btn btn-success w-100" style="background-color:#DF9755; border:none;">Proceed to Checkout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+
+<!-- Custom JS for Coupon Code (Optional) -->
+<script>
+    function applyCoupon() {
+        const couponCode = document.getElementById("coupon-code").value;
+        const totalPriceElement = document.getElementById("total-price");
+
+        if (couponCode === "DISCOUNT10") {
+            const newTotal = 29.98 * 0.9; // Applying 10% discount
+            totalPriceElement.textContent = `$${newTotal.toFixed(2)}`;
+            alert("Coupon applied! You get 10% off.");
+        } else {
+            alert("Invalid coupon code.");
+        }
+    }
+
+    function incrementValue() {
+        const input = document.getElementById('numberInput');
+        let value = parseInt(input.value, 10);
+        value = isNaN(value) ? 1 : value;
+        value++;
+        input.value = value;
+    }
+      
+    function decrementValue() {
+        const input = document.getElementById('numberInput');
+        let value = parseInt(input.value, 10);
+        value = isNaN(value) ? 1 : value;
+        value = value < 2 ? 1 : value - 1;
+        input.value = value;
+    }
+</script>
+
+{% endblock %}

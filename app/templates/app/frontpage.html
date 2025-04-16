@@ -1,0 +1,661 @@
+{% extends "app/base.html" %}
+{% block title %} Welcome | Storeze {%endblock%}
+{% load product_tags %}
+{% block meta_description %}
+    Explore trending categories, exclusive deals, top brands, and our best-selling products. Shop now for amazing offers!
+{% endblock %}
+
+{% block meta_keywords %}
+    Storeze, online shopping, trending categories, exclusive deals, top brands, best-selling products
+{% endblock %}
+
+{% block content %}
+<style>
+    .image-container {
+        position: relative;
+        text-align: center;
+        color: white;
+    }
+    .overlay-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+        padding: 10px;
+        border-radius: 5px;
+    }
+
+
+    /* Container for the slider */
+    .sliderr-container {
+        width: 100%;
+        margin: auto;
+        overflow: hidden;
+        position: relative;
+    }
+
+    /* The track of the slider (horizontally scrollable) */
+    .sliderr-track {
+        display: flex;
+        transition: transform 0.5s ease-in-out;
+        padding:10px;
+    }
+
+    /* Individual product slides */
+    .slidee {
+        min-width: 300px;
+        margin-right: 15px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        transition: transform 0.3s ease;
+    }
+
+    /* Product Image */
+    .slidee img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+
+    /* Product info */
+    .slidee-info {
+        padding: 15px;
+        text-align: center;
+    }
+
+    .slidee-info h4 {
+        font-size: 18px;
+        margin-bottom: 10px;
+    }
+
+    .slidee-info p {
+        font-size: 16px;
+        color: #555;
+    }
+
+    /* Arrow buttons for navigation */
+    .arrow-left,
+    .arrow-right {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: transparent;
+        color: white;
+        border: none;
+        padding: 10px;
+        cursor: pointer;
+        font-size: 18px;
+        border-radius: 50%;
+     
+    }
+
+    .arrow-left {
+        left: 2px;
+    }
+
+    .arrow-right {
+        right: 2px;
+    }
+
+    /* Hover effect on slide */
+    .slidee:hover {
+        transform: scale(1.05);
+    }
+    
+    /* Make sure the carousel images cover the full width */
+    .carousel-item img {
+        width: 100%;  /* Make the image fill the container's width */
+        height: 20vh; /* Optional: Adjust height to full viewport height (you can customize this) */
+        object-fit: cover; /* Ensures the image maintains its aspect ratio and fills the container */
+    }
+
+    /* Optional: For full width carousel container */
+    .carousel {
+        width: 100%;  /* Make carousel container take up full width */
+        overflow: hidden;
+    }
+
+    /* Flexbox container for the caption */
+    .carousel-caption {
+        position: absolute;
+        bottom: 20px;  /* Place the caption near the bottom of the image */
+        left: 50%;
+        transform: translateX(-50%);  /* Center the caption horizontally */
+        text-align: center;
+        color: white;
+        background-color: rgba(0, 0, 0, 0.5);  /* Semi-transparent background for readability */
+        padding: 10px;
+        border-radius: 5px;
+    }
+
+    /* Adjust the font size and padding based on the image height */
+    .carousel-caption h5 {
+        font-size: 2rem;
+    }
+
+    .carousel-caption p {
+        font-size: 1rem;
+    }
+
+    /* Make the caption text responsive */
+    @media (max-width: 768px) {
+        .carousel-caption h5 {
+            font-size: 1.5rem; /* Smaller font size for smaller screens */
+        }
+
+        .carousel-caption p {
+            font-size: 0.875rem; /* Smaller font size for smaller screens */
+        }
+    }
+    /* Container for the image */
+.image-container {
+    position: relative;
+    display: inline-block; /* Keep the container inline */
+}
+
+/* Image styling */
+.image {
+    width: 100%;
+    height: auto;
+}
+
+/* Icon styling */
+.iconn1 {
+    position: absolute;
+    top: 40px;  /* Adjust top position */
+    right: 20px; /* Adjust left position */
+    font-size: 0.8rem; /* Size of the icon */
+    color: black;  /* Icon color */
+    background: rgba(255, 255, 255, 0.9); /* Optional: dark background behind the icon */
+    border-radius: 50%; /* Circular icon background */
+    padding: 10px;
+}
+.iconn {
+    position: absolute;
+    top: 4px;  /* Adjust top position */
+    right: 20px; /* Adjust left position */
+    font-size: 0.8rem; /* Size of the icon */
+    color: black;  /* Icon color */
+    background: rgba(255, 255, 255, 0.9); /* Optional: dark background behind the icon */
+    border-radius: 50%; /* Circular icon background */
+    padding: 10px;
+}
+.quantity-selection {
+    margin-top: 15px;
+}
+
+.quantity-selection label {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.quantity-input {
+    display: flex;
+    align-items: center;
+}
+
+.quantity-input input {
+    width: 100px; /* Adjust width as needed */
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 5px;
+    margin: 0 5px;
+    /* Remove arrows */
+    -moz-appearance: textfield; /* Firefox */
+    appearance: textfield; /* Standard */
+}
+
+/* Remove arrows in WebKit browsers (Chrome, Safari) */
+.quantity-input input::-webkit-inner-spin-button,
+.quantity-input input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.quantity-btn {
+    background-color: #f8f9fa;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.quantity-btn:hover {
+    background-color: #e9ecef;
+}
+
+.image-container {
+    position: relative;
+    display: inline-block;
+}
+
+.discount-text {
+    position: absolute;
+    top: 10px; /* Adjust top position */
+    left: 10px; /* Adjust right position */
+    background-color: #DF9755; /* Background color for the discount text */
+    color: white; /* Text color */
+    padding: 5px 10px; /* Padding for the text */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 14px; /* Font size */
+    font-weight: bold; /* Bold text */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Optional: Add a shadow */
+}
+.banner {
+    position: relative;
+    width: 100%;
+    height: 64vh; /* Full viewport height */
+    overflow: hidden;
+}
+
+.banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensures the image covers the section without distortion */
+}
+
+/* Content inside the banner */
+.banner-content {
+    position: absolute;
+    top: 58%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Center content both vertically and horizontally */
+    color: #fff;
+    text-align: center;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column; /* Stack the elements vertically */
+    gap: 80px; /* Add space between elements */
+}
+
+.banner-title {
+    font-size: 3.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.banner-subtitle {
+    font-size: 1.5rem;
+    font-weight: 400;
+}
+
+.btn-shop-now {
+    font-size: 1.2rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    border-radius: 50px;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+}
+
+.btn-shop-now:hover {
+    background-color: #ffc107;
+    color: #333;
+    transform: translateY(-5px); /* Slight lift effect */
+}
+
+/* Media query for mobile responsiveness */
+@media (max-width: 767px) {
+    .banner-title {
+        font-size: 2.5rem;
+    }
+
+    .banner-subtitle {
+        font-size: 1.2rem;
+        margin-left: 1rem;
+        padding-right: 0;
+    }
+
+    .btn-shop-now {
+        width: auto;
+        font-size: 1rem;
+    }
+}
+/* Scrollable Brand Section */
+.brand-scroll-container {
+    overflow-x: auto; /* Enables horizontal scrolling */
+    padding-bottom: 1px; /* Add space for scrollbar if necessary */
+}
+
+.row {
+    display: flex; /* Makes sure the items are aligned in a row */
+    flex-wrap: nowrap; /* Ensures the items don't wrap, stay in one line */
+    align-items: center; /* Aligns images vertically */
+    justify-content: flex-start; /* Aligns images to the left */
+}
+
+.row .col-6 {
+    flex: 0 0 auto; /* Ensures each brand image stays at its natural size */
+    display: flex; /* Flex container for image alignment */
+    justify-content: center; /* Centers the image horizontally */
+    align-items: center; /* Centers the image vertically */
+}
+
+.img-fluid {
+    max-width: 100%;
+    height: auto; /* Ensures images are responsive */
+    border-radius: 8px; /* Optional: Adds rounded corners to images */
+    object-fit: contain; /* Ensures images are contained within their parent */
+    display: block; /* Prevents image from stretching */
+}
+.btn-primary:hover {
+    background-color: #ffc107; /* darker blue */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* larger shadow */
+}
+
+/* Button Styling */
+.btn-black {
+    background-color: black;
+    color: white;
+    font-weight: bold;
+    padding: 15px 30px;
+    font-size: 16px;
+    border: none;
+    border-radius: 10px; /* Reduced the roundness of the corners */
+    text-transform: uppercase;
+    transition: background-color 0.3s ease;
+}
+
+/* Button Hover Effect */
+.btn-black:hover {
+    background-color: #444; /* Slightly lighter shade of black */
+    color: white;
+}
+
+/* Flexbox for Centering the Button */
+.d-flex {
+    display: flex;
+    justify-content: center;
+}
+/* General Container Styling */
+.category-container {
+    padding: 0.11rem;  /* Optional padding for spacing */
+}
+
+/* Row Styling */
+.category-row {
+    margin: 0 auto; /* Center the row */
+}
+
+/* Category Banner Container */
+.category-banner {
+    position: relative;
+    width: 100%; /* Full width */
+    height: 300px; /* Fixed height for all banners */
+    overflow: hidden; /* Hide overflow to maintain clean edges */
+    margin-bottom: 20px; /* Space between banners */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional shadow for depth */
+    transition: transform 0.3s ease; /* Smooth hover effect */
+}
+
+/* Category Image Styling */
+.category-img {
+    width: 100%; /* Full width of the container */
+    height: 100%; /* Full height of the container */
+    object-fit: cover; /* Ensure image covers the container while maintaining aspect ratio */
+    object-position: center; /* Center the image */
+}
+
+/* Overlay Text Styling */
+.category-overlay-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 1.6rem; /* Font size of the overlay text */
+    font-weight: bold;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.6); /* Text shadow for contrast */
+    text-align: center;
+    padding: 0 auto;
+    max-width: 80%; /* Ensure text doesn't overflow the container */
+    z-index: 1; /* Ensures text is above the image */
+}
+
+/* Title Styling */
+.category-title {
+    font-size: 2rem; /* Adjust the font size */
+    font-weight: bold; /* Make the title bold */
+    color: #333; /* Dark color for the title text */
+    margin-bottom: 30px; /* Space below the title */
+    text-transform: uppercase; /* Make title uppercase for a modern look */
+    letter-spacing: 1px; /* Slight letter spacing for visual appeal */
+}
+
+
+/* Optional Responsive Styling: Adjust text size on smaller screens */
+@media screen and (max-width: 767px) {
+    .category-overlay-text {
+        font-size: 1.3rem; /* Smaller font size on mobile */
+    }
+    .category-img {
+        width: 280%; /* Full width of the container */
+        height: 100%; /* Full height of the container */
+        object-fit: cover; /* Ensure image covers the container while maintaining aspect ratio */
+        object-position: center; /* Center the image */
+    }
+    .jost-title {
+        font-family: "Jost", sans-serif;
+        font-optical-sizing: auto;
+        font-weight: 600;
+        font-style: normal;
+        font-size: 2rem;
+        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-top: 12rem;
+      }
+}
+
+  .jost-shop {
+    font-family: "Jost", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 300;
+    font-style: normal;
+  }
+  .btn-become-seller {
+    font-size: 1.2rem;
+    font-weight: 300;
+    text-transform: uppercase;
+    border-radius: 50px;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+  }
+
+</style>
+
+ <!-- Banner Section -->
+<section class="banner">
+    <!-- Replace with your image URL -->
+    <img src="https://images.pexels.com/photos/15481196/pexels-photo-15481196/free-photo-of-not-expected.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="Banner Image">
+
+    <div class="container banner-content mt-2">
+        <h1 class="jost-title mt-5">Welcome to Our Store</h1>
+        <p class="banner-subtitle">Exclusive Deals Just for You!</p>
+        <div class="d-flex gap-1 justify-content-center mb-2">
+            {% for i in categories %}
+            <a href="{% url 'category_detail' i.id %}">
+                <p class="btn btn-dark btn-shop-now jost-shop mb-0">SHOP {{i.name}}</p>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<div class="container text-center mt-4">
+    <div class="mb-4">
+        <h2>Check Our Brands</h2>
+        <p class="text-muted">Our partner brands provide exceptional value and a diverse selection of high-quality products.</p>
+    
+
+    <!-- Modern Black Button (Centered) -->
+    <div class="d-flex justify-content-center mb-0">
+        <a href="{% url 'brand_list'%}" class="btn btn-lg btn-black">
+            Explore All Brands
+        </a>
+    </div>
+
+    <!-- Scrollable Brand Container -->
+    <div class="brand-scroll-container">
+        <div class="row flex-nowrap overflow-auto">
+            {% for brand in brands %}
+                <div class="col-6 col-md-1 col-lg-3">
+                    <a href="{% url 'brand_detail' brand.id %}"><img src="{{brand.logo.url}}" class="img-fluid" alt="Brand {{brand.id}}"></a>
+                </div>
+            {% endfor %}
+
+            <!-- Add More Brands if needed -->
+        </div>
+    </div>
+</div>
+
+<section class="banner">
+    <!-- Replace with your image URL -->
+    <img src="https://images.pexels.com/photos/26700208/pexels-photo-26700208/free-photo-of-black-and-white-photo-of-a-pattern-with-triangles.png?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="Banner Image">
+
+    <div class="container banner-content mt-2">
+        <h1 class="jost-title mt-5">Want To Share Your Products</h1>
+        <p class="banner-subtitle">Start Showcasing Your Products In The Best Way Possible</p>
+        <div class="d-flex gap-3 justify-content-center">
+            <a href="{% url 'contact' %}">
+                <p class="btn btn-light btn-become-seller jost-shop justify-contetn-center mb-5 mx-2">Become a Seller</p>
+            </a>
+        </div>
+    </div>
+</section>
+
+<div class="category-container mt-4">
+    <h3 class="category-title text-center">Trending Categories</h3>
+    <div class="row category-row d-flex justify-content-center">
+        {% for i in categories %}
+        <div class="col text-center">
+            <div class="category-banner">
+                <a href="{% url 'category_detail' i.id %}">
+                <img src="{{ i.logo.url }}" class="category-img" alt="{{i.name}}">
+                <div class="category-overlay-text">{{i.name}}</div></a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="d-flex justify-content-center mt-4">
+        <a href="{% url 'category_list'%}" class="btn btn-lg btn-black">
+            View All Categories
+        </a>
+    </div>
+</div>
+    <!-- Product Slider -->
+    <div class="sliderr-container w-100">
+        <h3 class="md-2"> Top Deals Of The Day</h3>
+        <hr>
+        <div class="sliderr-track">
+            <!-- Slide 1 -->
+             {% for i in product %}
+            <div class="slidee image-container">
+                <a href="{{i.get_absolute_url}}">
+                <img src={{i.featured_image}} alt="{{i.product_name}}" style="height: 250px;"></a>
+                <!-- Discount Text -->
+                 {% if i.discount%}
+                <span class="discount-text text-white">-{{i.discount}}%</span>
+                {% endif %}
+                <a href="{% url 'add_to_wishlist' i.id %}"><i class="fa-regular fa-heart iconn"></i></a>
+                <div class="slidee-info">
+                    <h4 class="text-dark">{{i.product_name|truncatewords:10}}</h4>
+                    <p>{% call_sellprice i.price i.discount %} EGP &nbsp;&nbsp;
+                        {% if i.discount %}
+                        <del class="text-secondary">{{i.price}} EGP</del>
+                        </p>
+                        <a href="{% url 'product_detail' slug=i.slug %}" class="btn btn-secondary rounded-pill">
+                            Add to Cart (Select Size)
+                        </a>
+                    {% else %}
+                    <br>
+                    <a href="{% url 'product_detail' slug=i.slug %}" class="btn btn-secondary rounded-pill mt-3">
+                        Add to Cart (Select Size)
+                    </a>
+                    {% endif %}
+
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Navigation Arrows -->
+        <button class="arrow-left"><i class="carousel-control-prev-icon"></i></button>
+        <button class="arrow-right"><i class="carousel-control-next-icon"></i></button>
+    </div>
+
+{% include "app/footer.html" %}
+
+<script>
+    // JavaScript for controlling the slider
+    const leftArrow = document.querySelector('.arrow-left');
+    const rightArrow = document.querySelector('.arrow-right');
+    const sliderTrack = document.querySelector('.sliderr-track');
+    let currentIndex = 0;
+    const slides = document.querySelectorAll('.slidee');
+    const totalSlides = slides.length;
+
+    // Function to move to the next slide
+    function moveToNextSlide() {
+        if (currentIndex < totalSlides - 1) {
+            currentIndex++;
+        } else {
+            currentIndex = 0; // Loop back to the first slide
+        }
+        updateSliderPosition();
+    }
+
+    // Function to move to the previous slide
+    function moveToPrevSlide() {
+        if (currentIndex > 0) {
+            currentIndex--;
+        } else {
+            currentIndex = totalSlides - 1; // Loop back to the last slide
+        }
+        updateSliderPosition();
+    }
+
+    // Update the position of the slider track
+    function updateSliderPosition() {
+        const offset = -(currentIndex * (slides[0].clientWidth + 15)); // Slide width + margin-right
+        sliderTrack.style.transform = `translateX(${offset}px)`;
+    }
+
+    // Event listeners for the arrows
+    rightArrow.addEventListener('click', moveToNextSlide);
+    leftArrow.addEventListener('click', moveToPrevSlide);
+
+    // Optional: Auto slide every 3 seconds
+    setInterval(moveToNextSlide, 3000);
+
+
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const quickViewButtons = document.querySelectorAll('.quick-view-btn');
+        const modalProductImage = document.getElementById('modalProductImage');
+        const modalProductName = document.getElementById('modalProductName');
+        const modalProductPrice = document.getElementById('modalProductPrice');
+        const modalProductDescription = document.getElementById('modalProductDescription');
+    
+        quickViewButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                // Update modal content with product data
+                modalProductImage.src = button.getAttribute('data-product-image');
+                modalProductName.textContent = button.getAttribute('data-product-name');
+                modalProductPrice.textContent = 'LE ' + button.getAttribute('data-product-price');
+                modalProductDescription.innerHTML = button.getAttribute('data-product-description');
+            });
+        });
+    });
+    
+</script>
+
+
+{% endblock %}

@@ -1,0 +1,334 @@
+{% extends "app/base.html" %}
+{% load custom_filters %}
+
+{% block content %}
+<!-- Styles -->
+
+<style>
+    /* General Page Styling */
+    .page-title {
+        font-size: 2.5rem;
+        color: #333;
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .section-title {
+        font-size: 2rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 20px;
+        text-align: left;
+    }
+
+    /* Orders Section */
+    .order-item {
+        background-color: #fff;
+        padding: 20px;
+        margin-bottom: 30px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .order-item h3 {
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+    }
+
+    .order-item p {
+        margin: 5px 0;
+    }
+
+    .order-item ul {
+        padding-left: 20px;
+        margin-top: 15px;
+    }
+
+    .order-item li {
+        margin-bottom: 5px;
+    }
+
+    /* Product Table Section */
+    .product-table-container {
+        background-color: #f9f9f9;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .product-table {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .product-table th, .product-table td {
+        padding: 12px;
+        text-align: left;
+        font-size: 1rem;
+        color: #555;
+    }
+
+    .product-table th {
+        background-color: #f1f1f1;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    .product-table tbody tr:nth-child(even) {
+        background-color: #fafafa;
+    }
+
+    .product-table tbody tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    .action-links {
+        display: flex;
+        gap: 10px;
+    }
+
+    .action-button {
+        padding: 8px 15px;
+        border-radius: 5px;
+        font-weight: 600;
+        text-decoration: none;
+        color: white;
+        text-align: center;
+        transition: background-color 0.3s ease;
+    }
+
+    .edit-button {
+        background-color: #4CAF50; /* Green */
+    }
+
+    .edit-button:hover {
+        background-color: #45a049;
+    }
+
+    .delete-button {
+        background-color: #f44336; /* Red */
+    }
+
+    .delete-button:hover {
+        background-color: #e53935;
+    }
+
+    .post-product-button {
+        padding: 10px 20px;
+        background-color: #2196F3; /* Blue */
+        color: white;
+        font-size: 1.2rem;
+        font-weight: bold;
+        border-radius: 5px;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+    }
+
+    .post-product-button:hover {
+        background-color: #1976D2;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .mx-2 {
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+
+    .mt-4 {
+        margin-top: 40px;
+    }
+
+    /* Improved spacing */
+    .order-list {
+        margin-top: 20px;
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+        .product-table {
+            display: block;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .product-table th, .product-table td {
+            text-align: left;
+            font-size: 14px;
+            padding: 10px;
+        }
+
+        .product-table th {
+            background-color: #f1f1f1;
+        }
+
+        .product-table td {
+            display: block;
+            width: 100%;
+            text-align: right;
+            padding-left: 40%;
+            position: relative;
+        }
+
+        .product-table td::before {
+            content: attr(data-label);
+            position: absolute;
+            left: 10px;
+            top: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .product-table .action-links {
+            display: block;
+            margin-top: 10px;
+        }
+
+        .post-product-button {
+            font-size: 1rem;
+            padding: 8px 16px;
+        }
+    }
+
+    /* Larger screen styles */
+    @media (min-width: 769px) {
+        .product-table th, .product-table td {
+            padding: 12px;
+        }
+
+        .product-table {
+            display: table;
+        }
+    }
+</style>
+<div class="header">
+<!-- Page Content -->
+<h1 class="page-title">Welcome, {{ vendor.name }}</h1>
+</div>
+<!-- Orders Section -->
+
+
+<div class="container-fluid mt-4">
+<h2 class="section-title mb-4">Your Orders</h2>
+{% if orders %}
+    <div class="order-list">
+        {% for order in orders %}
+            <div class="order-item">
+                <h3>Order #{{ order.id }} - Status: {{ order.status }}</h3>
+                <p><strong>Created on:</strong> {{ order.created_at|date:"d M Y H:i" }}</p>
+                <p><strong>Address:</strong> {{ order.address }}</p>
+                <p><strong>Phone:</strong> {{ order.phone }}</p>
+                <p><strong>Email:</strong> {{ order.email }}</p>
+
+                <ul>
+                    {% for item in order_items %}
+                        {% if item.order == order %}
+                            <li>
+                                {{ item.product.product_name }} (x{{ item.quantity }}) - EGP {{ item.price|multiply:item.quantity }} - Size: {{ item.size }}
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>No orders found for your products.</p>
+{% endif %}
+    <div class="row mt-4">
+        <!-- Total Sales Card -->
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card shadow-sm rounded border-0">
+                <div class="card-body d-flex align-items-center">
+                    <div class="me-3">
+                        <i class="bi bi-basket fs-3 text-primary"></i> <!-- You can use icons from Bootstrap Icons -->
+                    </div>
+                    <div>
+                        <h5 class="card-title">Total Sales</h5>
+                        <p class="card-text fs-4 fw-bold text-success">{{ total_sales }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Revenue Card -->
+        <div class="col-md-6 col-lg-4 mb-5">
+            <div class="card shadow-sm rounded border-0">
+                <div class="card-body d-flex align-items-center">
+                    <div class="me-3">
+                        <i class="bi bi-cash fs-3 text-warning"></i> <!-- Use appropriate icons -->
+                    </div>
+                    <div>
+                        <h5 class="card-title">Total Revenue</h5>
+                        <p class="card-text fs-4 fw-bold text-success">LE {{ total_revenue | floatformat:2 }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <h2 class="section-title">Your Products</h2>
+
+    <div class="table-responsive mt-2">
+        <table class="table table-bordered table-sm">
+            <thead class="table-light">
+                <tr>
+                    <th>Product Name</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Total Quantity</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr>
+                    <td>{{ product.product_name }}</td>
+                    <td>{{ product.price }} EGP</td>
+                    <td>{{ product.availability }}</td>
+                    <td>{{ product.total_quantity }}</td>
+                    <td class="action-links">
+                        <!-- Edit Variations Button -->
+                        <a href="{% url 'post_product_variation' product.id %}" class="btn btn-warning btn-sm mb-2">Edit Variations</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<!-- Modal for Deletion Confirmation -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the product <strong id="productName"></strong>?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <!-- The delete button will be dynamically updated with the product ID -->
+                <a href={% url 'vendor_dashboard' %} id="deleteConfirmButton" class="btn btn-danger">Delete</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+    
+    
+<div class="text-center mb-4">
+    <a href="{% url 'post_product' %}" class="btn btn-success w-100 mt-3 text-center mb-5">Post New Product</a>
+</div>
+
+{% endblock %}

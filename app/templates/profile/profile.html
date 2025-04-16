@@ -1,0 +1,260 @@
+{% extends 'app/base.html'%}
+{% load static %}
+{% block content %}
+<style>
+    .container {
+        max-width: 800px;
+        padding: 20px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .text-center h4 {
+        margin-top: 10px;
+    }
+
+    .orders-section {
+        padding: 20px;
+        margin-top: 0;
+        background-color: #fff;
+    }
+
+    .orders-section h3 {
+        text-align: left;
+        font-size: 32px;
+        font-weight: bold;
+        margin-bottom: 30px;
+    }
+
+    .order-card {
+        background-color: #fff;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease-in-out;
+    }
+
+    .order-card h5 {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+
+    .order-card p {
+        font-size: 14px;
+        margin: 5px 0;
+        color: #555;
+    }
+
+    .items-list {
+        margin-top: 15px;
+    }
+
+    .items-list ul {
+        padding-left: 20px;
+        font-size: 14px;
+        color: #666;
+    }
+
+    .items-list li {
+        list-style-type: disc;
+    }
+
+    .no-orders {
+        font-size: 18px;
+        font-weight: 600;
+        color: #888;
+        text-align: center;
+        margin-top: 30px;
+    }
+
+    /* Profile Page Container */
+    .profile-page {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 100px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Title (Profile Header) */
+    .profile-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .profile-header h1 {
+        font-size: 36px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    /* Logo Section */
+    .logo-section {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .logo-section img {
+        width: 150px;
+    }
+
+    /* Form Styling */
+    .form-outline {
+        margin-bottom: 15px;
+    }
+
+    .form-label {
+        font-weight: 600;
+    }
+
+    .form-control {
+        border-radius: 5px;
+        padding: 12px;
+        font-size: 14px;
+    }
+
+    .alert {
+        margin-top: 20px;
+    }
+
+    /* Button Styling */
+    .btn {
+        width: 48%;
+        padding: 12px;
+        font-size: 14px;
+        border-radius: 5px;
+    }
+
+    .btn-warning {
+        background-color: #f0ad4e;
+        border: none;
+    }
+
+    .btn-danger {
+        background-color: #d9534f;
+        border: none;
+    }
+
+    /* Form Buttons Container */
+    .form-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .btn {
+            width: 100%; /* Buttons take full width on smaller screens */
+            margin-bottom: 10px;
+        }
+
+        .form-buttons {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<!-- Orders Section -->
+<div class="orders-section">
+    <h3>Your Orders</h3>
+
+    {% if orders %}
+        <div class="order-list">
+            {% for order in orders %}
+                <div class="order-card">
+                    <h5>Order #{{ order.id }}</h5>
+                    <p><strong>Date:</strong> {{ order.created_at }}</p>
+                    <p><strong>Total:</strong> {{ order.total_price }} EGP</p>
+
+                    <div class="items-list">
+                        <h6>Items:</h6>
+                        <ul>
+                            {% for item in order.order_items %}
+                                <li>{{ item.product.product_name }} (x{{ item.quantity }}) - ({{item.size}})</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="no-orders">No orders have been placed.</p>
+    {% endif %}
+</div>
+
+<!-- Profile Page Section -->
+<div class="profile-page">
+    <!-- Profile Header -->
+    <div class="profile-header">
+        <h1>Profile</h1>
+    </div>
+
+    <!-- Logo Section -->
+    <div class="logo-section">
+        <img src="{% static 'media/logo.png' %}" alt="logo">
+        <h4 class="mt-2">Shop Through Our Unlimited Stores</h4>
+    </div>
+
+    <!-- Profile Update Form -->
+    <form action="{% url 'profile_update' %}" method="POST">
+        {% csrf_token %}
+
+        <!-- Success Message -->
+        {% if messages %}
+            {% for message in messages %}
+                {% if message.tags == 'success' %}
+                    <div class="alert alert-success alert-dismissible fade show mt-4" role="alert">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
+        <!-- First Name Input -->
+        <div class="form-outline">
+            <label for="first_name" class="form-label">First Name</label>
+            <input type="text" id="first_name" class="form-control" placeholder="First Name" value="{{ user.first_name }}" name="first_name"/>
+        </div>
+
+        <!-- Last Name Input -->
+        <div class="form-outline">
+            <label for="last_name" class="form-label">Last Name</label>
+            <input type="text" id="last_name" class="form-control" placeholder="Last Name" value="{{ user.last_name }}" name="last_name"/>
+        </div>
+
+        <!-- Email Input -->
+        <div class="form-outline">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" id="email" class="form-control" placeholder="Email" value="{{ user.email }}" name="email"/>
+        </div>
+
+        <!-- Form Buttons (Update Profile & Logout) -->
+        <div class="form-buttons">
+            <!-- Update Profile Button -->
+            <button type="submit" class="btn btn-warning">Update Profile</button>
+    </form>
+            <!-- Logout Button -->
+            <form action="{% url 'logout' %}" method="POST" class="d-inline">
+                {% csrf_token %}
+               <button class="btn btn-danger w-100">Log out</button>
+            </form>
+        </div>
+    
+</div>
+
+<script>
+    // Initialization for ES Users
+import { Ripple, initMDB } from "mdb-ui-kit";
+
+initMDB({ Ripple });
+</script>
+{% endblock %}

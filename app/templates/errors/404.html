@@ -1,0 +1,29 @@
+{% extends 'app/base.html'%}
+
+{% block content %}
+<style>
+    body {
+        font-family: 'Roboto', sans-serif;
+        text-align: center;
+    }
+
+    .container {
+        max-width: 600px;
+        margin: 0 auto;
+        background-color: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+</style>
+
+<div class="container">
+<h1>404</h1>
+<p>Oops! The page you're looking for could not be found.</p>
+<a href="{% url 'frontpage'%}">Go Back to Home</a>
+</div>
+
+
+
+{% endblock %}

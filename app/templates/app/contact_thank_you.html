@@ -1,0 +1,23 @@
+{%extends 'app/base.html' %}
+
+{% block content %}
+<section class="bg-light py-5">
+    <div class="container text-center">
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="bg-white border rounded shadow-sm p-5">
+            <div class="mb-4 text-success">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-check-circle-fill" viewBox="0 0 16 16 "style="width: 64px; height: 64px; fill: #28a745;">
+                    <path d="M16 8a8 8 0 1 1-16 0 8 8 0 0 1 16 0zM11.97 5.97a.75.75 0 0 0-1.08-1.04L7.477 8.417 5.383 6.323a.75.75 0 1 0-1.06 1.06l2.5 2.5a.75.75 0 0 0 1.06 0l4.087-4.087z"/>
+                </svg>
+            </div>
+            <h1 class="h2">Thank You for Contacting Us!</h1>
+            <p class="lead text-secondary mt-3 mb-4">We've received your message and will get back to you shortly. In the meantime, feel free to explore our website.</p>
+            <a href="{% url 'frontpage' %}" class="btn btn-primary btn-lg">Back to Home</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+{% endblock %}

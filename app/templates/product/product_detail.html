@@ -1,0 +1,584 @@
+{% extends 'app/base.html' %}
+{% load static %}
+{% load product_tags %}
+
+{% block content %}
+<style>
+    /* Reset some basic styles */
+    body, h1, h2, p, ul {
+        margin: 0;
+        padding: 0;
+    }
+    body {
+        font-family: Arial, sans-serif;
+        background-color: white;
+        line-height: 1.6;
+    }
+
+    /* Container for the image presentation */
+    .image-presentation {
+        max-width: 800px;
+        margin: 0 auto;
+        text-align: center;
+    }
+
+    /* Main Image Container */
+    .main-image-container {
+        margin-bottom: 20px;
+        width: 100%; /* Ensure it takes up the full width */
+        max-width: 800px; /* Limit the maximum width */
+        height: 600px; /* Set a fixed height or maintain aspect ratio */
+        overflow: hidden; /* Hide overflow if the image exceeds the container */
+        position: relative;
+    }
+
+    .main-image {
+        width: 100%; /* Make the image scale with the container width */
+        height: 100%; /* Ensure the image fills the container height */
+        object-fit: contain; /* Ensures the image scales and maintains its aspect ratio */
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Thumbnail Container */
+    .thumbnail-container {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    /* Thumbnail Images */
+    .thumbnail {
+        width: 80px;
+        height: 80px;
+        cursor: pointer;
+        border: 2px solid #ddd;
+        border-radius: 4px;
+        transition: border-color 0.3s ease;
+    }
+
+    .thumbnail:hover {
+        border-color: #333;
+    }
+
+    /* Active Thumbnail */
+    .thumbnail.active {
+        border-color: #DF9755;
+    }
+
+
+    /* Product Details Section */
+    .product-details {
+        flex: 1;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .product-details h1 {
+        margin-bottom: 10px;
+        font-size: 2rem;
+    }
+
+    .product-details .price {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #DF9755;
+        margin-bottom: 15px;
+    }
+
+    .product-details p {
+        font-size: 1rem;
+        color: #555;
+        margin-bottom: 15px;
+    }
+
+
+    .add-to-cart-button:hover {
+        background-color: #333;
+    }
+
+    /* Related Products Section */
+    .related-products {
+        width: 100%;
+        margin-top: 40px;
+    }
+
+    .related-products h2 {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+        font-weight: bold;
+    }
+
+    .related-products .product-card {
+        display: inline-block;
+        width: 30%;
+        margin-right: 2%;
+        background-color: #fff;
+        padding: 10px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        margin-bottom: 70px;
+    }
+
+    .related-products .product-card img {
+        max-width: 80%;
+        height: auto;
+        border-radius: 8px;
+    }
+
+    .related-products .product-card h3 {
+        font-size: 1.1rem;
+        margin: 10px 0;
+    }
+
+    .related-products .product-card .price {
+        font-size: 1.2rem;
+        color: #DF9755;
+    }
+
+    .discountt-textt {
+        width: 3.1rem;
+        top: 10px; /* Adjust top position */
+        left: 10px; /* Adjust right position */
+        background-color: #DF9755; /* Background color for the discount text */
+        color: white; /* Text color */
+        padding: 5px 10px; /* Padding for the text */
+        border-radius: 5px; /* Rounded corners */
+        font-size: 14px; /* Font size */
+        font-weight: bold; /* Bold text */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Optional: Add a shadow */
+    }
+    .specs-content {
+        display: none; /* Hide the content by default */
+        margin-top: 10px; /* Add some spacing */
+    }
+
+input[type="number"] {
+    -moz-appearance: textfield; /* Hide spinners in Firefox */
+}
+
+.size-buttons .size-btn {
+    margin: 5px;
+    padding: 10px 15px;
+    font-size: 0.9rem;
+    background-color: transparent;
+    border: 1px solid #ddd;
+    color: #333;
+    transition: all 0.3s ease;
+}
+
+.size-buttons .size-btn:hover {
+    background-color: #f5f5f5;
+}
+
+.size-buttons .size-btn:active {
+    background-color: #e0e0e0;
+}
+.selected-thumbnail {
+    border: 2px solid #000; /* Adds a border to the selected thumbnail */
+}
+
+@media (min-width: 768px) {
+    .submit-button {
+        margin-top: 269px;
+    }
+}
+
+.sliderr-container {
+    position: relative;
+}
+
+.sliderr-track {
+    display: flex;
+    gap: 15px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+}
+
+.slidee {
+    scroll-snap-align: start;
+    flex-shrink: 0;
+    width: 230px; /* Adjust based on the width of the product images */
+}
+
+.arrow-left, .arrow-right {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.arrow-left {
+    left: 10px;
+}
+
+.arrow-right {
+    right: 10px;
+}
+/* Icon styling */
+.iconn1 {
+    position: absolute;
+    top: 40px;  /* Adjust top position */
+    right: 20px; /* Adjust left position */
+    font-size: 0.8rem; /* Size of the icon */
+    color: black;  /* Icon color */
+    background: rgba(255, 255, 255, 0.9); /* Optional: dark background behind the icon */
+    border-radius: 50%; /* Circular icon background */
+    padding: 10px;
+}
+.iconn {
+    position: absolute;
+    top: 4px;  /* Adjust top position */
+    right: 20px; /* Adjust left position */
+    font-size: 0.8rem; /* Size of the icon */
+    color: black;  /* Icon color */
+    background: rgba(255, 255, 255, 0.9); /* Optional: dark background behind the icon */
+    border-radius: 50%; /* Circular icon background */
+    padding: 10px;
+}
+.discount-text {
+    position: absolute;
+    top: 10px; /* Adjust top position */
+    left: 10px; /* Adjust right position */
+    background-color: #DF9755; /* Background color for the discount text */
+    color: white; /* Text color */
+    padding: 5px 10px; /* Padding for the text */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 14px; /* Font size */
+    font-weight: bold; /* Bold text */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Optional: Add a shadow */
+}
+/* Individual product slides */
+    .slidee {
+        min-width: 300px;
+        margin-right: 15px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        transition: transform 0.3s ease;
+    }
+
+    /* Product Image */
+    .slidee img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+
+    /* Product info */
+    .slidee-info {
+        padding: 15px;
+        text-align: center;
+    }
+
+    .slidee-info h4 {
+        font-size: 18px;
+        margin-bottom: 10px;
+    }
+
+    .slidee-info p {
+        font-size: 16px;
+        color: #555;
+    }
+    /* Arrow buttons for navigation */
+    .arrow-left,
+    .arrow-right {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: transparent;
+        color: white;
+        border: none;
+        padding: 10px;
+        cursor: pointer;
+        font-size: 18px;
+        border-radius: 50%;
+     
+    }
+
+    .arrow-left {
+        left: 2px;
+    }
+
+    .arrow-right {
+        right: 2px;
+    }
+
+    /* Hover effect on slide */
+    .slidee:hover {
+        transform: scale(1.05);
+    }
+
+/* Container for the slider */
+    .sliderr-container {
+        width: 90%;
+        max-width: 1200px;
+        margin: 40px auto;
+        overflow: hidden;
+        position: relative;
+    }
+
+    /* The track of the slider (horizontally scrollable) */
+    .sliderr-track {
+        display: flex;
+        transition: transform 0.5s ease-in-out;
+        padding:10px;
+    }
+    .overlay-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+        padding: 10px;
+        border-radius: 5px;
+    }
+    .image-container {
+        position: relative;
+        display: inline-block;
+    }
+    
+</style>
+<div class="container">
+    <!-- Displaying Messages -->
+    <div class="messages">
+        {% if messages %}
+            <div class="alert-container">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Product Image Presentation Section -->
+    <div class="image-presentation">
+        <!-- Main Image -->
+        <div class="main-image-container">
+            <img id="mainImage" class="main-image" src="{{ product.product_image_set.first.image.url }}" alt="Main Product Image">
+        </div>
+
+        <!-- Thumbnails for Navigation -->
+        <div class="thumbnail-container">
+            {% for i in product.product_image_set.all %}
+                <img src="{{ i.image.url }}" alt="Thumbnail" class="thumbnail" onclick="changeImage('{{ i.image.url }}', this)">
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Product Details Section -->
+    <div class="product-details d-flex flex-column">
+        {% if product.discount %}
+        <span class="discountt-textt text-white">-{{ product.discount }}%</span>
+        {% endif %}
+
+        <h6 class="text-secondary mt-4">{{ product.Brand }}</h6>
+        <h1 class="mt-0">{{ product.product_name }}</h1>
+
+        <!-- Display Price -->
+        <p class="price" id="price-display">
+            {% if product.discount %}
+                <span class="discounted-price" id="updated-price">
+                    <!-- Display the discounted price using the custom tag -->
+                    {% call_sellprice product.price product.discount %} EGP
+                </span>
+                &nbsp;&nbsp;
+                <del class="text-secondary">{{ product.price|floatformat:2 }} EGP</del>
+            {% else %}
+                <span class="price" id="updated-price">
+                    <!-- Display the product price if no discount -->
+                    {{ product.price|floatformat:2 }} EGP
+                </span>
+            {% endif %}
+        </p>
+
+        <p>{{ product.description | safe }}</p>
+
+        <!-- Size Selection Form -->
+        <form method="POST" action="{% url 'cart_add' product.id %}">
+            {% csrf_token %}
+
+            <!-- Size Selection -->
+            <div class="size-selection mt-3">
+                <label for="size">Size:</label>
+                <div class="size-buttons mt-2">
+                    {% for variation in product.variations.all %}
+                        <button type="button" 
+                                class="btn btn-outline-dark rounded-pill size-btn"
+                                data-size-id="{{ variation.size.id }}"
+                                data-price="{{ variation.price }}" 
+                                data-stock="{{ variation.stock }}"
+                                {% if variation.stock == 0 %} disabled {% endif %}
+                                onclick="selectSize(this, '{{ variation.size.name }}', {{ variation.price }}, {{ variation.stock }})">
+                            {{ variation.size.name }}
+                        </button>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Displaying Stock Based on Selected Size -->
+            <div class="stock-info mt-3">
+                <p>Stock Available: 
+                    <span id="stock-count">
+                        {% if product.total_quantity > 0 %}
+                            {{ product.total_quantity }} in stock
+                        {% else %}
+                            Out of stock
+                        {% endif %}
+                    </span>
+                </p>
+            </div>
+
+            <!-- Hidden Input for Size -->
+            <input type="hidden" name="selected_size" id="selected_size">
+
+            <!-- Add to Cart Button -->
+            <div class="mt-auto">
+                <button class="btn btn-dark rounded w-100 submit-button" type="submit">Add to Cart</button>
+            </div>
+        </form>     
+    </div>
+
+    <!-- Related Products Section with Slider -->
+    <div class="sliderr-container w-100">
+        <h3 class="md-2">Related Products</h3>
+        <hr>
+        <div class="sliderr-track">
+            {% for related_product in related_products %}
+            <div class="slidee image-container">
+                <a href="{% url 'product_detail' slug=related_product.slug %}">
+                    <img src="{{ related_product.product_image_set.first.image.url }}" 
+                        alt="{{ related_product.product_name }}" 
+                        style="height: 250px; object-fit: cover;">
+                </a>
+                <!-- Discount Text (If any) -->
+                {% if related_product.discount %}
+                <span class="discount-text text-white">-{{ related_product.discount }}%</span>
+                {% endif %}
+                <a href="{% url 'add_to_wishlist' related_product.id %}"><i class="fa-regular fa-heart iconn"></i></a>
+                <div class="slidee-info">
+                    <h4 class="text-dark">{{ related_product.product_name|truncatewords:10 }}</h4>
+                    <p>{% call_sellprice related_product.price related_product.discount %} EGP &nbsp;&nbsp;
+                        {% if related_product.discount %}
+                        <del class="text-secondary">{{ related_product.price }} EGP</del>
+                        </p>
+                        <a href="{% url 'product_detail' slug=related_product.slug %}" class="btn btn-secondary rounded-pill">
+                            Add to Cart (Select Size)
+                        </a>
+                    {% else %}
+                    <br>
+                    <a href="{% url 'product_detail' slug=related_product.slug %}" class="btn btn-secondary rounded-pill">
+                        Add to Cart (Select Size)
+                    </a>
+                    {% endif %}
+                </div>                
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Navigation Arrows -->
+        <button class="arrow-left"><i class="carousel-control-prev-icon"></i></button>
+        <button class="arrow-right"><i class="carousel-control-next-icon"></i></button>
+    </div>
+
+
+</div>
+
+<script>
+let selectedSize = '';
+let selectedPrice = '';
+let selectedStock = 0;
+
+    function selectSize(button, sizeName, price, stock) {
+        // Remove the 'selected' class from all size buttons
+        const sizeButtons = document.querySelectorAll('.size-btn');
+        sizeButtons.forEach(function(btn) {
+            btn.classList.remove('selected');
+        });
+
+        // Add the 'selected' class to the clicked button
+        button.classList.add('selected');
+
+        // Update the selected size, price, and stock
+        selectedSize = sizeName;
+        selectedPrice = price;
+        selectedStock = stock;
+
+        // Get the product discount
+        const productDiscount = {{ product.discount }}; // Assuming product.discount is passed to template
+
+        // Calculate the discounted price based on the selected variation price
+        const discountedPrice = selectedPrice - (selectedPrice * (productDiscount / 100));
+
+        // Update the size displayed (optional: show the size name if needed)
+        document.getElementById('selected_size').value = sizeName;
+
+        // Update the price display with the discounted price
+        const priceDisplay = document.getElementById('updated-price');
+        priceDisplay.innerHTML = discountedPrice.toFixed(2) + ' EGP';
+
+        // Update the stock count dynamically
+        const stockCount = document.getElementById('stock-count');
+        if (selectedStock > 0) {
+            stockCount.innerHTML = selectedStock + ' in stock';
+        } else {
+            stockCount.innerHTML = 'Out of stock';
+        }
+    }
+
+// Function to update stock availability based on stock value
+function updateStockAvailability(stock) {
+    const stockTextElement = document.getElementById('stock-count');
+    if (stock > 0) {
+        stockTextElement.innerText = "In stock";
+        stockTextElement.style.color = "green";  // Optional: change color for in-stock
+    } else {
+        stockTextElement.innerText = "Out of stock";
+        stockTextElement.style.color = "red";  // Optional: change color for out-of-stock
+    }
+}
+
+// Function to change the main image when a thumbnail is clicked
+function changeImage(imageUrl, thumbnail) {
+    // Change the main image source
+    const mainImage = document.getElementById('mainImage');
+    mainImage.src = imageUrl;
+    
+    // Highlight the active thumbnail
+    const thumbnails = document.querySelectorAll('.thumbnail');
+    thumbnails.forEach(function(thumbnail) {
+        thumbnail.classList.remove('active');
+    });
+    thumbnail.classList.add('active');
+}
+
+document.querySelector('.arrow-left').addEventListener('click', function() {
+    document.querySelector('.sliderr-track').scrollBy({
+        left: -250, // Adjust this value to control the scroll distance
+        behavior: 'smooth'
+    });
+});
+
+document.querySelector('.arrow-right').addEventListener('click', function() {
+    document.querySelector('.sliderr-track').scrollBy({
+        left: 250, // Adjust this value to control the scroll distance
+        behavior: 'smooth'
+    });
+});
+
+</script>
+
+
+{% endblock %}    

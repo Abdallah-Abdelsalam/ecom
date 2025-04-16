@@ -1,0 +1,230 @@
+{% extends 'app/base.html'%}
+{% load product_tags %}
+{% load cart_tag %}
+{% load static %}
+{% block content %}
+<style>
+    /* Custom Styles */
+    .order-item img {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 5px;
+    }
+
+    .order-item .product-info {
+        max-width: 180px;
+    }
+
+    .order-item .price {
+        color: #DF9755;
+        font-weight: bold;
+    }
+
+    .order-item .price-old {
+        text-decoration: line-through;
+        color: #6c757d;
+    }
+
+    .order-item .quantity input {
+        width: 60px;
+        height: 35px;
+        border-radius: 5px;
+    }
+
+    .order-summary .total {
+        font-weight: bold;
+        color: #DF9755;
+    }
+
+    .order-summary .subtotal,
+    .order-summary .shipping {
+        font-size: 1.1rem;
+    }
+
+    .order-item .product-info p {
+        margin: 0;
+    }
+
+    .order-summary {
+        margin-top: 30px;
+        font-size: 1.2rem;
+    }
+
+    .order-summary .d-flex {
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .card-body input, .card-body textarea {
+        border-radius: 10px;
+    }
+
+    .order-summary, .payment-summary {
+        margin-top: 1rem;
+    }
+
+    .card {
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+    }
+
+    .unregistered {
+        background-color: #f8f9fa;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 0.9rem;
+        margin-bottom: 15px;
+    }
+
+    .payment-summary .d-flex {
+        justify-content: space-between;
+    }
+
+    .btn-apply {
+        border-radius: 10px;
+    }
+
+    /* Responsive Styles */
+    @media (max-width: 767px) {
+        .order-summary, .payment-summary {
+            margin-top: 15px;
+        }
+        .order-summary .total {
+            font-size: 1.1rem;
+        }
+    }
+    .jost-nav {
+        font-family: "Jost", sans-serif;
+        font-optical-sizing: auto;
+        font-weight: 500;
+        font-style: normal;
+      }
+    
+</style>
+
+<div class="container-fluid mt-4 p-2 mb-5">
+    <!-- Main Content Row -->
+    <div class="row justify-content-center">
+        <!-- Order Details Section -->
+        <div class="col-lg-8 col-md-10 col-12">
+            <div class="order-details">
+                <form action="{% url 'complete' %}" method="POST">
+                    {% csrf_token %}
+                    <p class="pb-2 fw-bold jost-nav">Order</p>
+
+                    <!-- Order Item Loop -->
+                    {% for key, value in request.session.cart.items %}
+                    <div class="order-item d-flex justify-content-between align-items-center mb-3">
+                        <div class="d-flex align-items-center">
+                            <img class="order-item" src="{{ value.featured_image }}" alt="{{ value.product_name }}">
+                            <div class="ps-3 product-info">
+                                <p class="fw-bold">{{ value.product_name }}</p>
+                                <small class="text-muted d-block">Quantity: <span class="fw-bold">{{ value.quantity }}</span></small>
+                                <small class="text-muted">Size: <span class="fw-bold">{{ value.selected_size }}</span></small>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="price">EGP {{ value.price | multiply:value.quantity }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <!-- Order Summary -->
+                    <div class="order-summary mt-4 jost-nav">
+                        <h3>Order Summary</h3>
+
+                        <!-- Subtotal Calculation -->
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>Subtotal:</span>
+                            <span>EGP {{ cart_total_price }}</span>
+                        </div>
+
+                        <!-- Coupon Discount -->
+                        {% if coupon_discount %}
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>Coupon Discount:</span>
+                            <span class="text-success">-{{ coupon_discount }}%</span>
+                        </div>
+                        {% endif %}
+
+                        <!-- Tax Calculation -->
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>Tax:</span>
+                            <span>EGP {{ tax }}</span>
+                        </div>
+
+                        <!-- Shipping Fee -->
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>Shipping:</span>
+                            {% if cart_total_price > 1000 %}
+                            <span class="text-success">Free</span>
+                            {% else %}
+                            <span>EGP 50</span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Final Total Calculation -->
+                        <div class="d-flex justify-content-between align-items-center total">
+                            <span>Total:</span>
+                            <span id="amount">EGP {{ final_total }}</span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Contact Section -->
+        <div class="col-lg-8 col-md-10 col-12 mt-4">
+            <p class="pb-2 fw-bold">Contact Information</p>
+            <div class="card">
+                <div class="card-body">
+                    <form action="{% url 'complete' %}" method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="firstName" class="form-label">First Name</label>
+                            <input type="text" required class="form-control" placeholder="Enter your first name" name="first_name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="lastName" class="form-label">Last Name</label>
+                            <input type="text" required class="form-control" placeholder="Enter your last name" name="last_name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" required class="form-control" placeholder="Enter your email" name="email">
+                        </div>
+                        <div class="mb-3">
+                            <label for="phoneNumber" class="form-label">Phone Number</label>
+                            <input type="tel" required class="form-control" placeholder="Enter your phone number" name="phone">
+                        </div>
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Address</label>
+                            <textarea class="form-control" required rows="3" placeholder="Enter your address" name="address"></textarea>
+                        </div>
+                        <button type="submit" required class="btn btn-primary w-100">Place Order</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>    
+
+<script>
+    // Get values from context passed to the template
+    var item_amounts = {{ cart_total_price }};  // Initial cart total (before discount)
+    var tax = {{ tax }};                         // Tax value
+    var shipping_fee = {% if cart_total_price <= 1000 %} 50 {% else %} 0 {% endif %};
+    var coupon_discount = {{ coupon_discount }};  // Coupon discount percentage
+
+    // Calculate the total price after coupon discount
+    var discount_amount = item_amounts * (coupon_discount / 100);
+    var total_after_discount = item_amounts - discount_amount;
+
+    // Final total including tax and shipping
+    var final_total = total_after_discount + tax + shipping_fee;
+
+    // Update the total amount in the HTML
+    document.getElementById('amount').innerHTML = "EGP " + final_total.toFixed(2);
+</script>
+{% endblock %}

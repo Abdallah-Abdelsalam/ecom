@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Storeze - New Order Notification</title>
+</head>
+<body style="font-family: 'Segoe UI', sans-serif; background-color: #f5f5f5; padding: 20px; color: #333;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 700px; margin: auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+        <tr>
+            <td style="padding: 30px;">
+                <h2 style="color: #dc3545; margin-bottom: 20px;">📦 New Order Notification</h2>
+                <p style="font-size: 16px; line-height: 1.6;">
+                    Hello! A customer has placed an order that includes your product(s). Please review the order details below:
+                </p>
+
+                <hr style="margin: 25px 0; border: none; border-top: 1px solid #ddd;">
+
+                <h3 style="margin-bottom: 10px; color: #333;">Customer Info</h3>
+                <p style="margin: 5px 0;"><strong>Name:</strong> {{ order.user }}</p>
+                <p style="margin: 5px 0;"><strong>Address:</strong> {{ order.address }}</p>
+                <p style="margin: 5px 0;"><strong>Phone:</strong> {{ order.phone }}</p>
+
+                <hr style="margin: 25px 0; border: none; border-top: 1px solid #ddd;">
+
+                <h3 style="margin-bottom: 10px; color: #333;">Your Products</h3>
+                <table width="100%" cellspacing="0" cellpadding="10" style="border-collapse: collapse;">
+                    <thead style="background-color: #f0f0f0;">
+                        <tr>
+                            <th align="left" style="border-bottom: 1px solid #ddd;">Product</th>
+                            <th align="left" style="border-bottom: 1px solid #ddd;">Price</th>
+                            <th align="left" style="border-bottom: 1px solid #ddd;">Quantity</th>
+                            <th align="left" style="border-bottom: 1px solid #ddd;">Size</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in order.items.all %}
+                            {% if item.vendor == vendor %}
+                            <tr>
+                                <td style="border-bottom: 1px solid #eee;">{{ item.product.product_name }}</td>
+                                <td style="border-bottom: 1px solid #eee;">LE {{ item.price }}</td>
+                                <td style="border-bottom: 1px solid #eee;">{{ item.quantity }}</td>
+                                <td style="border-bottom: 1px solid #eee;">{{ item.size }}</td>
+                            </tr>
+                            {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <p style="margin-top: 30px; font-size: 14px; color: #666;">
+                    Please prepare the items for delivery. If you have questions, reach out to our support team.
+                </p>
+
+                <p style="margin-top: 10px; font-size: 14px; color: #aaa;">— The Storeze Vendor Team</p>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
