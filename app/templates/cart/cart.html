@@ -144,25 +144,6 @@
                         </div>
                     </div>
 
-                    <!-- Quantity & Price -->
-                    <div class="d-flex align-items-center mt-3 mt-md-3">
-                        <div class="number-input d-flex align-items-center">
-                            <!-- Decrement Button -->
-                            <a href="{% if value.product_id %}{% url 'item_decrement' value.product_id %}{% else %}# {% endif %}" 
-                                class="{% if value.quantity == 1 %}disabled-link{% endif %}" style="text-decoration:none;">
-                                <button class="minus-btn btn btn-outline-secondary" onclick="decrementValue()" {% if value.quantity == 1 %}disabled{% endif %}>-</button>
-                            </a>
-
-                            <!-- Quantity Input Field -->
-                            <input type="number" class="form-control mx-2" value="{{ value.quantity }}" min="1" id="numberInput" style="width: 50px;">
-
-                            <!-- Increment Button -->
-                            <a href="{% if value.product_id %}{% url 'item_increment' value.product_id %}{% else %}# {% endif %}" style="text-decoration:none;">
-                                <button class="plus-btn btn btn-outline-secondary" onclick="incrementValue()">+</button>
-                            </a>
-                        </div>
-                    </div>
-
                     <!-- Clear Button (Remove Item) -->
                     <div class="d-flex align-items-center mt-3 mt-md-0 position-absolute top-0 end-0">
                         <!-- Trash Icon for Clearing Specific Item -->
@@ -187,29 +168,29 @@
                     <h5 class="card-title">Cart Summary</h5>
                     <!-- Sub Total and Total Price -->
                     <div class="d-flex justify-content-between">
-                        <span>Sub Total:</span>
+                        <span>sub total:</span>
                         <span id="total-price">EGP {{ cart_total_price }}</span>
                     </div>
                     <div class="d-flex justify-content-between">
-                        <span>Tax:</span>
+                        <span>tax:</span>
                         <span id="total-price">EGP {{ tax }}</span>
                     </div>
                     <!-- Coupon Code -->
                     {% if valid_coupon %}
                     <div class="d-flex justify-content-between align-items-center">
-                        <span>Coupon Code:</span>
+                        <span>coupon code:</span>
                         <span>{{ coupon_code }}</span>
                     </div>
 
                     <div class="d-flex justify-content-between align-items-center">
-                        <span>Coupon Discount:</span>
+                        <span>coupon discount:</span>
                         <span class="text-success">-EGP {{ discount_amount }}</span>
                     </div>
                     {% endif %}
                     
                     <!-- Shipping Fee (50 if under 1000, Free if over 1000) -->
                     <div class="d-flex justify-content-between align-items-center">
-                        <span>Shipping:</span>
+                        <span>shipping:</span>
                         {% if cart_total_price > 1000 %}
                         <span class="text-success">Free</span>
                         {% else %}
@@ -221,14 +202,14 @@
                     <form method="POST">
                         {% csrf_token %}
                         <div class="d-flex justify-content-between align-items-center total">
-                            <span>Total:</span>
+                            <span>total:</span>
                             <span type="submit">EGP {{ final_total }}</span>
                         </div>
                     </form>
         
                     <!-- Coupon Code Section -->
                     <div class="mt-3">
-                        <label for="coupon-code" class="form-label">Coupon Code</label>
+                        <label for="coupon-code" class="form-label">coupon code</label>
                         <form method="get">
                             {% if valid_coupon %}
                             <div class="alert alert-success" role="alert">
@@ -252,7 +233,7 @@
                         <div class="form-check">
                             <input class="form-check-input" type="radio" id="payment-cod" name="payment-method" value="cash_on_delivery" checked disabled>
                             <label class="form-check-label" for="payment-cod">
-                                Cash on Delivery
+                                cash on delivery
                             </label>
                         </div>
                     </div>

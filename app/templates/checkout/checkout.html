@@ -11,6 +11,63 @@
         object-fit: cover;
         border-radius: 5px;
     }
+    /* Card-style order container */
+.order-details {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.3s ease;
+}
+
+.order-details:hover {
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* General card enhancements */
+.card {
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+    border: none;
+    background-color: #fff;
+}
+
+/* Modern input styling */
+.card-body input, .card-body textarea {
+    border-radius: 8px;
+    border: 1px solid rgb(161, 161, 161);
+    padding: 10px;
+    font-size: 1rem;
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: black;
+    border: none;
+    padding: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #c97f3d;
+}
+
+/* Headings and labels */
+h3, .form-label {
+    color: #333;
+    font-weight: 600;
+}
+
+.order-summary, .payment-summary {
+    background-color: #fafafa;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.03);
+}
+
 
     .order-item .product-info {
         max-width: 180px;
@@ -101,6 +158,11 @@
         font-weight: 500;
         font-style: normal;
       }
+      .divider {
+        border-bottom: 1px solid #e0e0e0;
+        margin: 10px 0;
+    }
+    
     
 </style>
 
@@ -112,58 +174,61 @@
             <div class="order-details">
                 <form action="{% url 'complete' %}" method="POST">
                     {% csrf_token %}
-                    <p class="pb-2 fw-bold jost-nav">Order</p>
+                    <h3 class="pb-2 fw-bold jost-nav">Order</h3>
 
                     <!-- Order Item Loop -->
                     {% for key, value in request.session.cart.items %}
-                    <div class="order-item d-flex justify-content-between align-items-center mb-3">
-                        <div class="d-flex align-items-center">
-                            <img class="order-item" src="{{ value.featured_image }}" alt="{{ value.product_name }}">
-                            <div class="ps-3 product-info">
-                                <p class="fw-bold">{{ value.product_name }}</p>
-                                <small class="text-muted d-block">Quantity: <span class="fw-bold">{{ value.quantity }}</span></small>
-                                <small class="text-muted">Size: <span class="fw-bold">{{ value.selected_size }}</span></small>
+                        <div class="order-item d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex align-items-center">
+                                <img class="order-item" src="{{ value.featured_image }}" alt="{{ value.product_name }}">
+                                <div class="ps-3 product-info">
+                                    <p class="fw-bold">{{ value.product_name }}</p>
+                                    <small class="text-muted d-block">Quantity: <span class="fw-bold">{{ value.quantity }}</span></small>
+                                    <small class="text-muted">Size: <span class="fw-bold">{{ value.selected_size }}</span></small>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="price">EGP {{ value.price | multiply:value.quantity }}</p>
                             </div>
                         </div>
-                        <div>
-                            <p class="price">EGP {{ value.price | multiply:value.quantity }}</p>
-                        </div>
-                    </div>
+                        <div class="divider"></div>  <!-- Add this line -->
                     {% endfor %}
 
                     <!-- Order Summary -->
                     <div class="order-summary mt-4 jost-nav">
-                        <h3>Order Summary</h3>
+                        <h3 class="pb-1 jost-nav" >Order Summary</h3>
 
                         <!-- Subtotal Calculation -->
                         <div class="d-flex justify-content-between align-items-center">
-                            <span>Subtotal:</span>
+                            <span>subtotal:</span>
                             <span>EGP {{ cart_total_price }}</span>
                         </div>
+                        <div class="divider"></div>
 
-                        <!-- Coupon Discount -->
                         {% if coupon_discount %}
                         <div class="d-flex justify-content-between align-items-center">
                             <span>Coupon Discount:</span>
                             <span class="text-success">-{{ coupon_discount }}%</span>
                         </div>
+                        <div class="divider"></div>
                         {% endif %}
 
-                        <!-- Tax Calculation -->
                         <div class="d-flex justify-content-between align-items-center">
-                            <span>Tax:</span>
+                            <span>tax:</span>
                             <span>EGP {{ tax }}</span>
                         </div>
+                        <div class="divider"></div>
 
-                        <!-- Shipping Fee -->
                         <div class="d-flex justify-content-between align-items-center">
-                            <span>Shipping:</span>
+                            <span>shipping:</span>
                             {% if cart_total_price > 1000 %}
                             <span class="text-success">Free</span>
                             {% else %}
                             <span>EGP 50</span>
                             {% endif %}
                         </div>
+                        <div class="divider"></div>
+
 
                         <!-- Final Total Calculation -->
                         <div class="d-flex justify-content-between align-items-center total">
@@ -183,11 +248,11 @@
                     <form action="{% url 'complete' %}" method="POST">
                         {% csrf_token %}
                         <div class="mb-3">
-                            <label for="firstName" class="form-label">First Name</label>
+                            <label for="firstName" class="form-label">First name</label>
                             <input type="text" required class="form-control" placeholder="Enter your first name" name="first_name">
                         </div>
                         <div class="mb-3">
-                            <label for="lastName" class="form-label">Last Name</label>
+                            <label for="lastName" class="form-label">Last name</label>
                             <input type="text" required class="form-control" placeholder="Enter your last name" name="last_name">
                         </div>
                         <div class="mb-3">
@@ -195,14 +260,14 @@
                             <input type="email" required class="form-control" placeholder="Enter your email" name="email">
                         </div>
                         <div class="mb-3">
-                            <label for="phoneNumber" class="form-label">Phone Number</label>
+                            <label for="phoneNumber" class="form-label">Phone number</label>
                             <input type="tel" required class="form-control" placeholder="Enter your phone number" name="phone">
                         </div>
                         <div class="mb-3">
-                            <label for="address" class="form-label">Address</label>
-                            <textarea class="form-control" required rows="3" placeholder="Enter your address" name="address"></textarea>
+                            <label for="address" class="form-label">Full address</label>
+                            <textarea class="form-control" required rows="3" placeholder="Enter Your Full address" name="address"></textarea>
                         </div>
-                        <button type="submit" required class="btn btn-primary w-100">Place Order</button>
+                        <button type="submit" required class="btn btn-primary w-100">PLACE ORDER</button>
                     </form>
                 </div>
             </div>
