@@ -244,7 +244,7 @@
 </style>
     <body>
         <div class="announcement">
-            <p>Announcement Here!&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<a href="#">Full Story ></a></p>
+            <p>FREE SHIPPING on orders more than EGP 1600!&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
         </div>
    <!-- Your navigation bar or header (optional) -->
 <nav class="navbar navbar-expand-lg" style="background-color:transparent ;">
@@ -339,6 +339,11 @@
                             <i class="fs-5 bi-table"></i> Orders
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark fo" href="{% url 'contact'%}">
+                            <i class="fs-5 bi-people"></i> Contact Us
+                        </a>
+                    </li>
                     {% for i in main_category %}
                     <ul class="navbar-nav nav flex-column">
                         <li class="dropdown nav-item">
@@ -354,12 +359,7 @@
                     {% endfor %}
                     <li class="nav-item">
                         <a class="nav-link text-dark fo" href="{% url 'product' %}">
-                            <i class="fs-5 bi-grid"></i> Products
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark fo" href="{% url 'contact'%}">
-                            <i class="fs-5 bi-people"></i> Contact Us
+                            <i class="fs-5 bi-grid"></i> All Products
                         </a>
                     </li>
                 </ul>

@@ -9,6 +9,11 @@ class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
         fields = ['featured_image', 'product_name','total_quantity' ,'main_categorys', 'price', 'discount', 'categories', 'description', 'main_categorys']
+        labels = {
+            'discount': 'Dscount (%)',
+            'price': 'Price (EGP)',
+        }
+        
 
 
 
@@ -30,6 +35,12 @@ class ProductVariationForm(forms.ModelForm):
     class Meta:
         model = ProductVariation
         fields = ['size', 'price', 'stock', 'discount']
+        labels = {
+            'size': 'Size',
+            'price': 'Price (EGP)',
+            'stock': 'Stock',
+            'discount': 'Discount (%)',
+        }
 
 
 class ContactForm(forms.Form):

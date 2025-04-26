@@ -11,42 +11,6 @@
         font-style: normal;
     }
 
-    .off {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        background-color: #DF9755;
-        color: white;
-        padding: 5px;
-        border-radius: 5px;
-    }
-
-    .product-price {
-        font-size: 16px;
-        font-weight: 700;
-        color: #DF9755;
-    }
-
-    /* Remove Button Styling */
-    .remove-btn {
-        background-color: #FA4032;
-        color: white;
-        font-weight: bold;
-        border: none;
-        border-radius: 5px;
-        padding: 10px 15px;
-        margin-top: 15px;
-        width: 100%; /* Full width for better clickability */
-        text-align: center;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
-
-    .remove-btn:hover {
-        background-color: #b87a47;
-    }
-
-    /* Product Card and Wishlist Heart Icon Styles */
     .product-card {
         border: none; /* Removed border */
         border-radius: 10px;
@@ -56,25 +20,25 @@
         position: relative; /* Allow positioning of the wishlist heart icon */
         box-shadow: none; /* Removed shadow to have no frame */
     }
-
+    
     .product-image img {
         width: 100%;
-        height: 400px;
+        height: 300px;
         object-fit: cover;
-        border-radius: 10px; /* Added border-radius to match card corners */
+        border-radius: 0px; /* Added border-radius to match card corners */
     }
-
+    
     /* Wishlist Heart Button - Top Left */
     .wishlist-btn {
         position: absolute;
-        top: 13px;
-        left: 13px;
+        top: 10px;
+        left: 10px;
         background-color: white;
-        border: 2px solid #ddd;
+        border: 1.6px solid #ddd;
         color: #00000;
         border-radius: 50%;
-        width: 30px;
-        height: 30px;
+        width: 24px;
+        height: 24px;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -82,12 +46,56 @@
         font-size: 14px;
         transition: background-color 0.3s ease, border-color 0.3s ease;
     }
-
+    
     .wishlist-btn:hover {
         background-color: #FFD700; /* Gold color on hover */
         border-color: #FFD700; /* Gold border on hover */
     }
-
+    
+    .off {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: #DF9755;
+        color: white;
+        padding: 4px;
+        border-radius: 15px;
+        font-size: 12px;
+    }
+    
+    .product-price {
+        font-size: 12px;
+        font-weight: 700;
+        color: #DF9755;
+    }
+    
+    
+        .color-filter {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+    
+        .color-circle {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid #ddd;
+            cursor: pointer;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+    
+        .color-circle:hover {
+            transform: scale(1.1);
+            border-color: #000;
+        }
+    
+        .color-circle.selected {
+            border-color: #000;
+            transform: scale(1.1);
+        }
+    
 
     /* Product Grid Layout */
     .row {
@@ -150,6 +158,18 @@
         background-color: #DF9755; /* Color for the underline */
         margin: 10px auto; /* Center the underline */
     }
+    .tuffy-regular {
+        font-family: "Tuffy", sans-serif;
+        font-weight: 300;
+        font-style: normal;
+        text-transform: uppercase;
+      }
+    .size{
+        font-family: "Tuffy", sans-serif;
+        font-weight: 400;
+        font-style: regular;
+        font-size: 0.80rem;
+    }
 
 </style>
 <div class="mt-2 mx-3">
@@ -170,32 +190,70 @@
         <div class="row" id="product-list">
             <!-- Loop through products -->
             {% for i in products %}
-                <div class="col-6 col-md-6 col-lg-3 product-card" data-category="{{ i.main_categorys }}" data-brand="{{ i.categories }}" data-color="{{ i.color }}" data-price="{% call_sellprice i.price i.discount %}">
-                    <div class="product-image">
-                        <a href="{{ i.get_absolute_url }}">
-                            <img src="{{ i.featured_image.url }}" alt="{{ i.product_name }}">
-                        </a>
-                        {% if i.total_quantity == 0 %}
-                            <span class="badgy badge bg-danger position-absolute start-0 m-2" style="font-size: 0.75rem;">Out of Stock</span>
-                        {% endif %}
-                        {% if i.discount %}
-                            <span class="off">-{{ i.discount }}%</span>
-                        {% endif %}
-
-                        <!-- Wishlist Heart Icon (Top Left) -->
+            <div class="col-6 col-md-6 col-lg-3 product-card" data-category="{{ i.main_categorys }}" data-brand="{{ i.categories }}" data-price="{% call_sellprice i.price i.discount %}">
+                <div class="product-image position-relative">
+                    <a href="{{ i.get_absolute_url }}">
+                        <img src="{{ i.featured_image.url }}" alt="{{ i.product_name }}">
+                    </a>
+                
+                    {% if i.total_quantity == 0 %}
+                        <span class="badge bg-danger position-absolute bottom-0 end-0 m-2" style="font-size: 0.75rem;">Out of Stock</span>
+                    {% endif %}
+                
+                    {% if i.discount %}
+                        <span class="off">-{{ i.discount }}%</span>
+                    {% endif %}
+                
+                    {% if i.id %}
                         <div class="wishlist-btn">
-                            <a href="{% url 'add_to_wishlist' i.id %}"><i class="fa-regular fa-heart text-dark"></i></a>
+                            <a href="{% url 'add_to_wishlist' i.id %}">
+                                <i class="fa-regular fa-heart text-dark"></i>
+                            </a>
                         </div>
-                    </div>
-
-                    <h5 class="text-center mt-2 dm-sans">{{ i.product_name }}</h5>
-                    <div class="product-price text-center">
-                        {% call_sellprice i.price i.discount %} EGP &nbsp;
-                        {% if i.discount %}
-                            <del class="text-secondary dm-sans">{{ i.price }} EGP</del>
-                        {% endif %}
-                    </div>
+                    {% else %}
+                        <p>No product ID available</p>
+                    {% endif %}
                 </div>
+                
+                <h6 class="text-center mt-2 tuffy-regular">{{ i.product_name }}</h6>
+    
+                <!-- Display Price and Discount below the product -->
+                <div class="product-price text-center d-flex justify-content-center align-items-center gap-2">
+                    <p class="mb-0 fw-bold">
+                        EGP {% call_sellprice i.price i.discount %} 
+                    </p>
+                    {% if i.discount %}
+                        <del class="text-secondary"> EGP {{ i.price }} </del>
+                    {% endif %}
+                </div>
+    
+                <!-- Display Available Sizes below the product -->
+                <div class="product-variants mt-3 text-center">
+                    {% if i.variations.all %}
+                        <!-- Available Sizes -->
+                        <div class="sizes">
+                            <ul class="list-inline">
+                                {% for variant in i.variations.all %}
+                                    {% if forloop.counter <= 3 %}
+                                        <li class="list-inline-item" style="font-size: 0.70rem; padding: 2px 8px; border: 1px solid #ddd; border-radius: 15px; margin: 1px;"
+                                            {% if not data.in_stock %}opacity: 0.4;{% endif %}>
+                                            {{ variant.size.name }}
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                                {% if i.variations.all|length > 3 %}
+                                    <li class="list-inline-item" style="font-size: 0.85rem; padding: 5px 10px; border-radius: 4px; margin: 2px; color: #555;">
+                                        + more sizes
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    {% else %}
+                        <p>No variants available.</p>
+                    {% endif %}
+                </div>
+                
+            </div>
             {% endfor %}
         </div>
     </div>

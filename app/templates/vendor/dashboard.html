@@ -147,7 +147,7 @@
 
     /* Improved spacing */
     .order-list {
-        margin-top: 20px;
+        margin-top: 14px;
     }
 
     /* Mobile Responsiveness */
@@ -194,6 +194,22 @@
             font-size: 1rem;
             padding: 8px 16px;
         }
+        .table {
+            width: 80%;  /* Decrease the table width */
+            margin: 0 auto; /* Center the table */
+        }
+        /* Compact buttons */
+        .btn-compact {
+            padding: 2px 5px; /* Reduce padding */
+            font-size: 0.65rem; /* Make text size smaller */
+        }
+
+        /* Button width adjustment */
+        .btn-sm {
+            padding: 2px 5px; /* Adjust size of the small button */
+            font-size: 0.85rem; /* Smaller text */
+        }
+        
     }
 
     /* Larger screen styles */
@@ -205,104 +221,158 @@
         .product-table {
             display: table;
         }
+        .table {
+            width: 100%;  /* Decrease the table width */
+            margin: 0 auto; /* Center the table */
+        }
+        
     }
+    .order-item {
+        transition: opacity 0.3s ease-in-out;
+    }
+
+    .order-item.shipped {
+        opacity: 0.5;
+        background-color: #f8f9fa;  /* Optional: add a background color to indicate the shipped status */
+    }
+
+
+
 </style>
-<div class="header">
+<div class="header mt-3">
 <!-- Page Content -->
 <h1 class="page-title">Welcome, {{ vendor.name }}</h1>
 </div>
 <!-- Orders Section -->
+<div class="mt-2 mx-3">
+    <h2 class="section-title mb-1">Your Orders</h2>
+    {% if orders %}
+        <div class="order-list">
+            {% for order in orders %}
+                <div class="order-item {% if order.shipped %}shipped{% endif %}">
+                    <h3>Order #{{ order.id }} - Status: {{ order.status }}</h3>
+                    <p><strong>Created on:</strong> {{ order.created_at|date:"d M Y H:i" }}</p>
+                    <p><strong>Address:</strong> {{ order.address }}</p>
+                    <p><strong>Phone:</strong> {{ order.phone }}</p>
+                    <p><strong>Email:</strong> {{ order.email }}</p>
 
+                    <ul>
+                        {% for item in order_items %}
+                            {% if item.order == order %}
+                                <li>
+                                    {{ item.product.product_name }} (x{{ item.quantity }}) - EGP {{ item.price|multiply:item.quantity }} - Size: {{ item.size }}
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
 
-<div class="container-fluid mt-4">
-<h2 class="section-title mb-4">Your Orders</h2>
-{% if orders %}
-    <div class="order-list">
-        {% for order in orders %}
-            <div class="order-item">
-                <h3>Order #{{ order.id }} - Status: {{ order.status }}</h3>
-                <p><strong>Created on:</strong> {{ order.created_at|date:"d M Y H:i" }}</p>
-                <p><strong>Address:</strong> {{ order.address }}</p>
-                <p><strong>Phone:</strong> {{ order.phone }}</p>
-                <p><strong>Email:</strong> {{ order.email }}</p>
-
-                <ul>
-                    {% for item in order_items %}
-                        {% if item.order == order %}
-                            <li>
-                                {{ item.product.product_name }} (x{{ item.quantity }}) - EGP {{ item.price|multiply:item.quantity }} - Size: {{ item.size }}
-                            </li>
-                        {% endif %}
-                    {% endfor %}
-                </ul>
-            </div>
-        {% endfor %}
-    </div>
-{% else %}
+                    <!-- Mark as Shipped Button -->
+                    {% if not order.shipped %}
+                        <a href="{% url 'mark_order_shipped' order.id %}" class="btn btn-success btn-sm" onclick="event.preventDefault(); markAsShipped({{ order.id }});">
+                            Mark as Shipped
+                        </a>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
     <p>No orders found for your products.</p>
-{% endif %}
-    <div class="row mt-4">
-        <!-- Total Sales Card -->
-        <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card shadow-sm rounded border-0">
-                <div class="card-body d-flex align-items-center">
-                    <div class="me-3">
-                        <i class="bi bi-basket fs-3 text-primary"></i> <!-- You can use icons from Bootstrap Icons -->
-                    </div>
-                    <div>
-                        <h5 class="card-title">Total Sales</h5>
-                        <p class="card-text fs-4 fw-bold text-success">{{ total_sales }}</p>
-                    </div>
+    {% endif %}
+</div>
+
+<div class="mt-4 mx-3">
+    <!-- Total Sales Card -->
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card shadow-sm rounded border-0">
+            <div class="card-body d-flex align-items-center">
+                <div class="me-3">
+                    <i class="bi bi-basket fs-3 text-primary"></i> <!-- You can use icons from Bootstrap Icons -->
+                </div>
+                <div>
+                    <h5 class="card-title">Total Sales</h5>
+                    <p class="card-text fs-4 fw-bold text-success">{{ total_sales }}</p>
                 </div>
             </div>
         </div>
-
-        <!-- Total Revenue Card -->
-        <div class="col-md-6 col-lg-4 mb-5">
-            <div class="card shadow-sm rounded border-0">
-                <div class="card-body d-flex align-items-center">
-                    <div class="me-3">
-                        <i class="bi bi-cash fs-3 text-warning"></i> <!-- Use appropriate icons -->
-                    </div>
-                    <div>
-                        <h5 class="card-title">Total Revenue</h5>
-                        <p class="card-text fs-4 fw-bold text-success">LE {{ total_revenue | floatformat:2 }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    <h2 class="section-title">Your Products</h2>
-
-    <div class="table-responsive mt-2">
-        <table class="table table-bordered table-sm">
-            <thead class="table-light">
-                <tr>
-                    <th>Product Name</th>
-                    <th>Price</th>
-                    <th>Stock</th>
-                    <th>Total Quantity</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for product in products %}
-                <tr>
-                    <td>{{ product.product_name }}</td>
-                    <td>{{ product.price }} EGP</td>
-                    <td>{{ product.availability }}</td>
-                    <td>{{ product.total_quantity }}</td>
-                    <td class="action-links">
-                        <!-- Edit Variations Button -->
-                        <a href="{% url 'post_product_variation' product.id %}" class="btn btn-warning btn-sm mb-2">Edit Variations</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
     </div>
 </div>
 
+<!-- Total Revenue Card -->
+<div class="col-md-6 col-lg-4 mb-5 mx-3">
+    <div class="card shadow-sm rounded border-0">
+        <div class="card-body d-flex align-items-center">
+            <div class="me-3">
+                <i class="bi bi-cash fs-3 text-warning"></i> <!-- Use appropriate icons -->
+            </div>
+            <div>
+                <h5 class="card-title">Total Revenue</h5>
+                <p class="card-text fs-4 fw-bold text-success">LE {{ total_revenue | floatformat:2 }}</p>
+            </div>
+        </div> 
+    </div>
+</div>
+
+<h2 class="section-title mx-2">Your Products</h2>
+<div class="table-responsive mt-2 mx-1">
+    <table class="table table-bordered table-sm" style="width: 90%; margin: 0 auto;">
+        <thead class="table-light">
+            <tr>
+                <th>Product Name</th>
+                <th>Price</th>
+                <th>Total Stock</th>
+                <th>Variations</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+            <tr>
+                <td>{{ product.product_name }}
+                    {% if product.total_quantity < 5 %}
+                        <i class="bi bi-exclamation-triangle-fill text-warning ms-1" title="Low stock"></i>
+                    {% endif %}
+                </td>
+                
+                <td>{{ product.price }} EGP</td>
+                <td>{{ product.total_quantity }}</td>
+                <td class="action-links">
+                    <!-- Add Variations Button (on top) -->
+                    <a href="{% url 'post_product_variation' product.id %}" class="btn btn-success btn-sm mb-2 w-100 btn-compact">Add</a>
+                    
+                    <!-- View Variations Button -->
+                    <button class="btn btn-outline-info btn-sm mb-2 w-100 btn-compact" type="button" data-bs-toggle="collapse" data-bs-target="#variations-{{ product.id }}" aria-expanded="false">
+                        View
+                    </button>
+                </td>
+            </tr>
+            <tr class="collapse" id="variations-{{ product.id }}">
+                <td colspan="5">
+                    {% with product.variations.all as variations %}
+                        {% if variations %}
+                            <ul class="list-group list-group-flush">
+                                {% for v in variations %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <a href="{% url 'edit_product_variation' v.id %}" class="btn btn-outline-secondary btn-sm">Edit</a>
+                                        <div>
+                                            <strong>Size:</strong> {{ v.size.name }},
+                                            <strong>Price:</strong> {{ v.price }} EGP,
+                                            <strong>Stock:</strong> {{ v.stock }}
+                                            {% if v.stock < 5 %}
+                                                <i class="bi bi-exclamation-triangle-fill text-warning ms-1" title="Low stock"></i>
+                                            {% endif %}
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="text-muted">No variations found.</p>
+                        {% endif %}
+                    {% endwith %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
 <!-- Modal for Deletion Confirmation -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
@@ -327,8 +397,27 @@
     
     
     
-<div class="text-center mb-4">
+<div class="text-center mb-4 mx-3">
     <a href="{% url 'post_product' %}" class="btn btn-success w-100 mt-3 text-center mb-5">Post New Product</a>
 </div>
+
+<script>
+    function markAsShipped(orderId) {
+        // Send a request to the server to mark the order as shipped
+        fetch(`/mark-order-shipped/${orderId}/`, {
+            method: 'GET',
+        })
+        .then(response => {
+            if (response.ok) {
+                // Find the order card and apply the shipped class to it
+                const orderCard = document.querySelector(`#order-${orderId}`);
+                orderCard.classList.add('shipped');
+            } else {
+                alert('Failed to mark order as shipped');
+            }
+        });
+    }
+</script>
+
 
 {% endblock %}

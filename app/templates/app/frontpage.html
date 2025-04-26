@@ -320,6 +320,7 @@
 .brand-scroll-container {
     overflow-x: auto; /* Enables horizontal scrolling */
     padding-bottom: 1px; /* Add space for scrollbar if necessary */
+    
 }
 
 .row {
@@ -468,6 +469,153 @@
     transition: all 0.3s ease;
   }
 
+  .tuffy-regular {
+    font-family: "Tuffy", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  .btn-category {
+    background-color: #ffffff;
+    color: #212529;
+    border: 1px solid #ddd;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    text-transform: uppercase;
+}
+
+.category-name {
+    font-size: 15px;
+    font-weight: 500;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.btn-outline-dark:hover {
+    background-color: #212529;
+    color: white;
+    transition: all 0.3s ease;
+}
+/* Feature Box Styling */
+.feature-box {
+    border: 2px solid transparent;
+    padding: 30px;
+    text-align: center;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+/* Hover Effects */
+.feature-box:hover {
+    transform: translateY(-10px); /* Lifts the box */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); /* Deeper shadow */
+    border-color: #d4af37; /* Luxurious gold border on hover */
+}
+
+/* Icon Color Change */
+.feature-box i {
+    color: #343a40;
+    transition: color 0.3s ease;
+}
+
+.feature-box:hover i {
+    color: #d4af37; /* Gold color on hover */
+}
+
+/* Title Styling */
+.feature-box h5 {
+    font-size: 1.2rem;
+    color: #343a40;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+/* Paragraph Styling */
+.feature-box p {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+/* Add animation for smooth zoom-in effect */
+.feature-box:hover {
+    animation: zoomIn 0.5s ease-in-out;
+}
+
+@keyframes zoomIn {
+    0% {
+        transform: scale(0.98);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Mobile-Specific Adjustments */
+@media (max-width: 768px) {
+    .feature-box {
+        padding: 20px; /* Smaller padding for mobile */
+        margin-bottom: 20px; /* Add space between the boxes */
+    }
+
+    .feature-box i {
+        font-size: 3rem; /* Adjust icon size for mobile */
+    }
+
+    .feature-box h5 {
+        font-size: 1.1rem; /* Adjust title font size for mobile */
+    }
+
+    .feature-box p {
+        font-size: 0.85rem; /* Adjust paragraph font size for mobile */
+    }
+
+    /* Adjust the box shadow effect for smaller screens */
+    .feature-box:hover {
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+}
+
+/* For Tablets and Larger Screens */
+@media (min-width: 768px) {
+    .feature-box {
+        padding: 30px;
+    }
+}
+
+/* Ensure the container does not overflow */
+.container {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Flex wrap for mobile and small screens */
+.row {
+    flex-wrap: wrap; /* Ensure that the columns wrap in mobile view */
+}
+
+@media (max-width: 576px) {
+    .feature-box {
+        padding: 15px;
+    }
+}
+
+.why-shop-with-us{
+    background-color: #f8f9fa;
+    padding: 2rem 0;
+    margin: 0 auto;
+}
+
+
 </style>
 
  <!-- Banner Section -->
@@ -477,45 +625,46 @@
 
     <div class="container banner-content mt-2">
         <h1 class="jost-title mt-5">Welcome to Our Store</h1>
-        <p class="banner-subtitle">Exclusive Deals Just for You!</p>
+        <p class="banner-subtitle mt-5">Exclusive Deals Just for You!</p>
         <div class="d-flex gap-1 justify-content-center mb-2">
             {% for i in categories %}
             <a href="{% url 'category_detail' i.id %}">
-                <p class="btn btn-dark btn-shop-now jost-shop mb-0">SHOP {{i.name}}</p>
+                <p class="btn btn-category jost-shop mb-0">SHOP {{ i.name }}</p>
             </a>
             {% endfor %}
         </div>
     </div>
 </section>
 
-<div class="container text-center mt-4">
-    <div class="mb-4">
-        <h2>Check Our Brands</h2>
-        <p class="text-muted">Our partner brands provide exceptional value and a diverse selection of high-quality products.</p>
-    
+<div class="text-center mt-4 mx-3">
+        <div class="mb-4">
+            <h2>Check Our Brands</h2>
+            <p class="text-muted">Our partner brands provide exceptional value and a diverse selection of high-quality products.</p>
+        
 
-    <!-- Modern Black Button (Centered) -->
-    <div class="d-flex justify-content-center mb-0">
-        <a href="{% url 'brand_list'%}" class="btn btn-lg btn-black">
-            Explore All Brands
-        </a>
-    </div>
+        <!-- Modern Black Button (Centered) -->
+        <div class="d-flex justify-content-center mb-0">
+            <a href="{% url 'brand_list'%}" class="btn btn-lg btn-black">
+                Explore All Brands
+            </a>
+        </div>
 
-    <!-- Scrollable Brand Container -->
-    <div class="brand-scroll-container">
-        <div class="row flex-nowrap overflow-auto">
-            {% for brand in brands %}
-                <div class="col-6 col-md-1 col-lg-3">
-                    <a href="{% url 'brand_detail' brand.id %}"><img src="{{brand.logo.url}}" class="img-fluid" alt="Brand {{brand.id}}"></a>
-                </div>
-            {% endfor %}
+        <!-- Scrollable Brand Container -->
+        <div class="brand-scroll-container">
+            <div class="row flex-nowrap overflow-auto">
+                {% for brand in brands %}
+                    <div class="col-6 col-md-1 col-lg-3">
+                        <a href="{% url 'brand_detail' brand.id %}"><img src="{{brand.logo.url}}" class="img-fluid" alt="Brand {{brand.id}}"></a>
+                    </div>
+                {% endfor %}
 
-            <!-- Add More Brands if needed -->
+                <!-- Add More Brands if needed -->
+            </div>
         </div>
     </div>
 </div>
 
-<section class="banner">
+<section class="banner mx-3">
     <!-- Replace with your image URL -->
     <img src="https://images.pexels.com/photos/26700208/pexels-photo-26700208/free-photo-of-black-and-white-photo-of-a-pattern-with-triangles.png?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="Banner Image">
 
@@ -529,66 +678,83 @@
         </div>
     </div>
 </section>
-
-<div class="category-container mt-4">
-    <h3 class="category-title text-center">Trending Categories</h3>
-    <div class="row category-row d-flex justify-content-center">
-        {% for i in categories %}
-        <div class="col text-center">
-            <div class="category-banner">
-                <a href="{% url 'category_detail' i.id %}">
-                <img src="{{ i.logo.url }}" class="category-img" alt="{{i.name}}">
-                <div class="category-overlay-text">{{i.name}}</div></a>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-    <div class="d-flex justify-content-center mt-4">
-        <a href="{% url 'category_list'%}" class="btn btn-lg btn-black">
-            View All Categories
-        </a>
-    </div>
-</div>
-    <!-- Product Slider -->
-    <div class="sliderr-container w-100">
-        <h3 class="md-2"> Top Deals Of The Day</h3>
-        <hr>
-        <div class="sliderr-track">
-            <!-- Slide 1 -->
-             {% for i in product %}
+<div class="sliderr-container w-100 mx-3">
+    <h3 class="md-2 mt-5"> Top Deals Of The Day</h3>
+    <hr>
+    <div class="sliderr-track">
+        {% for i in product %}
+            {% if i.total_quantity > 0 %}
             <div class="slidee image-container">
-                <a href="{{i.get_absolute_url}}">
-                <img src={{i.featured_image}} alt="{{i.product_name}}" style="height: 250px;"></a>
+                <a href="{{ i.get_absolute_url }}">
+                    <img src="{{ i.featured_image }}" alt="{{ i.product_name }}" style="height: 250px;">
+                </a>
+                
                 <!-- Discount Text -->
-                 {% if i.discount%}
-                <span class="discount-text text-white">-{{i.discount}}%</span>
+                {% if i.discount %}
+                    <span class="discount-text text-white">-{{ i.discount }}%</span>
                 {% endif %}
-                <a href="{% url 'add_to_wishlist' i.id %}"><i class="fa-regular fa-heart iconn"></i></a>
+
+                <a href="{% url 'add_to_wishlist' i.id %}">
+                    <i class="fa-regular fa-heart iconn"></i>
+                </a>
+
                 <div class="slidee-info">
-                    <h4 class="text-dark">{{i.product_name|truncatewords:10}}</h4>
-                    <p>{% call_sellprice i.price i.discount %} EGP &nbsp;&nbsp;
+                    <h4 class="text-dark tuffy-regular">{{ i.product_name|truncatewords:10 }}</h4>
+                    <p>
+                        {% call_sellprice i.price i.discount %} EGP &nbsp;&nbsp;
                         {% if i.discount %}
-                        <del class="text-secondary">{{i.price}} EGP</del>
-                        </p>
-                        <a href="{% url 'product_detail' slug=i.slug %}" class="btn btn-secondary rounded-pill">
-                            Add to Cart (Select Size)
-                        </a>
-                    {% else %}
-                    <br>
-                    <a href="{% url 'product_detail' slug=i.slug %}" class="btn btn-secondary rounded-pill mt-3">
+                            <del class="text-secondary">{{ i.price }} EGP</del>
+                        {% endif %}
+                    </p>
+                    <a href="{% url 'product_detail' slug=i.slug %}" class="btn btn-outline-dark rounded-pill">
                         Add to Cart (Select Size)
                     </a>
-                    {% endif %}
-
                 </div>
             </div>
-            {% endfor %}
-        </div>
-
-        <!-- Navigation Arrows -->
-        <button class="arrow-left"><i class="carousel-control-prev-icon"></i></button>
-        <button class="arrow-right"><i class="carousel-control-next-icon"></i></button>
+            {% endif %}
+        {% endfor %}
     </div>
+
+    <!-- Navigation Arrows -->
+    <button class="arrow-left"><i class="carousel-control-prev-icon"></i></button>
+    <button class="arrow-right"><i class="carousel-control-next-icon"></i></button>
+</div>
+
+<div class="why-shop-with-us mx-2">
+    <div class="mt-4">
+        <h2 class="text-center fw-bold mb-4">Why Shop With Us?</h2>
+        <div class="row text-center g-4 justify-content-center">
+            <!-- Support Local Sellers -->
+            <div class="col-12 col-md-6 col-lg-3">
+                <div class="feature-box p-4 shadow-lg bg-white rounded transition-all">
+                    <i class="fas fa-store fa-3x mb-3 text-dark"></i>
+                    <h5 class="fw-semibold mb-2">Top Local Sellers</h5>
+                    <p class="text-muted small">Buy directly from trusted vendors and empower local businesses.</p>
+                </div>
+            </div>
+
+            <!-- Secure Payments -->
+            <div class="col-12 col-md-6 col-lg-3">
+                <div class="feature-box p-4 shadow-lg bg-white rounded transition-all">
+                    <i class="fas fa-user-check fa-3x mb-3 text-dark"></i>
+                    <h5 class="fw-semibold mb-2">Trusted Sellers</h5>
+                    <p class="text-muted small">Carefully vetted sellers delivering consistent quality and service.</p>
+                </div>
+            </div>
+            
+
+            <!-- Nationwide Shipping -->
+            <div class="col-12 col-md-6 col-lg-3">
+                <div class="feature-box p-4 shadow-lg bg-white rounded transition-all">
+                    <i class="fas fa-shipping-fast fa-3x mb-3 text-dark"></i>
+                    <h5 class="fw-semibold mb-2">Nationwide Shipping</h5>
+                    <p class="text-muted small">Fast and reliable delivery service across all cities in Egypt.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 {% include "app/footer.html" %}
 

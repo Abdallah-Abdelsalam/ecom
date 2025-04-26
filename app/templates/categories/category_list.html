@@ -115,16 +115,39 @@ h1 {
         height: 100%; /* Ensures consistent item height on desktop */
     }
 }
+.modern-heading {
+    font-family: 'Jost', 'Segoe UI', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #333;
+}
 
+.modern-heading::after {
+    content: "";
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(90deg,rgb(222, 165, 53),rgb(255, 255, 255));
+    display: block;
+    margin: 10px auto 0;
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+
+.modern-heading:hover::after {
+    width: 120px;
+}
 
 </style>
-<div class="text-center text-md-start mb-2 ms-md-3 mt-md-4 mx-2">
-    <h1>All Categories</h1>
-</div>
+<h1 class="text-center my-4 fw-bold display-5 position-relative modern-heading">
+    <span style="color:#DF9755">All</span> Categories
+</h1>
 <div class="brand-list">
     {% for cat in categories %}
         <div class="brand-item">
-            <h2><a href="{% url 'category_detail' cat.id %}">{{ cat.name }}</h2>
+            <h2 style="font-family: 'Jost', 'Segoe UI', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #333;"><a href="{% url 'category_detail' cat.id %}">{{ cat.name }}</h2>
             {% if cat.logo %}
                 <img src="{{ cat.logo.url}}" alt="{{ cat.name }} Logo"></a>
             {% endif %}

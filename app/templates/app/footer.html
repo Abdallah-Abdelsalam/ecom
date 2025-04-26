@@ -1,144 +1,109 @@
 <style>
-    /* Footer base styles */
-body {
-    font-family: 'Roboto', sans-serif; /* Apply Roboto for general text */
-}
-
-.footer {
-  background-color: #343a40; /* Dark background color */
-  color: #fff;  /* White text color */
-  padding-top: 30px;
-  padding-bottom: 30px;
-  overflow-x: hidden; /* Prevents horizontal overflow */
-  width: 100%; /* Ensures full width */
-  box-sizing: border-box; /* Ensures padding doesn't cause overflow */
-}
-
-.footer a {
-  color: #fff;
-  text-decoration: none;
-}
-
-.footer a:hover {
-  text-decoration: underline;
-}
-
-.footer .social-links a {
-  margin-right: 15px;
-}
-
-/* Mobile View (Default styles for smaller screens) */
-@media (max-width: 767px) {
-  .footer .row {
-    text-align: center;
-    margin-left: 0;
-    margin-right: 0; /* Ensures no unwanted horizontal margin */
-    flex-direction: column; /* Stack elements vertically in mobile view */
+  body {
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
   }
-
-  .footer .col-md-4 {
-    margin-bottom: 30px;
-    width: 100%; /* Ensure full width on mobile view */
+  
+  .footer {
+      background-color:rgb(10, 8, 0);
+      color: #fff;
+      padding: 40px 20px;
+      width: 100%;
+      box-sizing: border-box;
   }
-
-  .footer .col-12 {
-    width: 100%; /* Make sure sections take full width on mobile */
+  
+  .footer a {
+      color: #fff;
+      text-decoration: none;
   }
-
-  .footer .social-links {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
+  
+  .footer a:hover {
+      text-decoration: underline;
   }
-}
-
-/* Tablet/Small Desktop View */
-@media (min-width: 768px) and (max-width: 991px) {
-  .footer .row {
-    text-align: center;
-    margin-left: 0;
-    margin-right: 0; /* Ensures no unwanted horizontal margin */
+  
+  .footer .social-links a {
+      margin-right: 15px;
   }
-
-  .footer .col-md-4 {
-    margin-bottom: 20px;
-    width: 100%; /* Ensures columns take full width */
+  
+  .footer h5 {
+      font-weight: 600;
+      margin-bottom: 20px;
   }
-
-  .footer .social-links {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
+  
+  /* Responsive Styling */
+  @media (max-width: 767px) {
+      .footer .row {
+          flex-direction: column;
+          text-align: center;
+      }
+      .footer .col-12 {
+          margin-bottom: 30px;
+      }
+      .footer .social-links {
+          justify-content: center;
+      }
   }
-}
-
-/* Larger Screens (Default Bootstrap Grid) */
-@media (min-width: 992px) {
-  .footer .row {
-    display: flex;
-    justify-content: space-between; /* Spacing for columns */
-    text-align: left;
+  
+  @media (min-width: 768px) {
+      .footer .row {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: space-between;
+      }
+      .footer .col-12 {
+          width: 100%;
+      }
+      .footer .col-md-4 {
+          width: 100%;
+          max-width: 32%;
+      }
   }
-
-  .footer .col-md-4 {
-    margin-bottom: 0;
+  
+  .footer-bottom {
+      text-align: center;
+      margin-top: 30px;
+      font-size: 14px;
+      color: #ccc;
+      margin-bottom: 30px;
   }
-}
+  </style>
+  <footer class="footer">
+    <div class="container-fluid px-4">
+        <div class="row">
+            <!-- About -->
+            <div class="col-12 col-md-4 mb-4">
+                <h5>Storeze</h5>
+                <p>A trusted multi-vendor marketplace bringing buyers and sellers together. <br>
+                Secure. Scalable. Seamless.</p>
+            </div>
 
-/* Footer Bottom Section Styling */
-@media (max-width: 767px) {
-  .footer .row.align-items-center {
-    text-align: center;
-  }
+            <!-- Quick Links -->
+            <div class="col-12 col-md-4 mb-4">
+                <h5>Quick Links</h5>
+                <ul class="list-unstyled">
+                    <li><a href="#">Home</a></li>
+                    <li><a href="{% url 'product' %}">Shop</a></li>
+                    <li><a href="{% url 'contact' %}">Become a Seller</a></li>
+                    <li><a href="{% url 'brand_list' %}">All Brands</a></li>
+                </ul>
+            </div>
 
-  .footer .col-md-6 {
-    text-align: center;
-    margin-bottom: 10px;
-  }
-}
-</style>
-
-<footer class="footer bg-dark text-white">
-    <div class="container-fluid">
-      <div class="row text-center text-md-start">
-      
-        <!-- Introduction / About Section -->
-        <div class="col-12 col-md-4 mb-3 mb-md-0">
-          <h5 class="text-uppercase fw-bold mb-4">Storeze</h5>
-          <p class="mb-1">
-            A trusted multi-vendor marketplace bringing buyers and sellers together. <br>
-            Secure. Scalable. Seamless.
-          </p>
+            <!-- Social -->
+            <div class="col-12 col-md-4 mb-4">
+                <h5>Connect with Us</h5>
+                <div class="social-links d-flex">
+                    <a href="https://www.instagram.com/storez.e/"><i class="fab fa-instagram fa-lg"></i></a>
+                    <!-- Add more icons if needed -->
+                </div>
+            </div>
         </div>
-  
-        <!-- Quick Links Section -->
-        <div class="col-12 col-md-4 mb-4 mb-md-0 mt-4 mx-5">
-          <h5 class="text-uppercase fw-bold mb-2">Quick Links</h5>
-          <ul class="list-unstyled">
-            <li><a href="#" class="text-white text-decoration-none">Home</a></li>
-            <li><a href="{% url 'product'%}" class="text-white text-decoration-none">Shop</a></li>
-            <li><a href="{% url 'contact'%}" class="text-white text-decoration-none">Become a Seller</a></li>
-            <li><a href="{% url 'brand_list'%}" class="text-white text-decoration-none">All Brands</a></li>
-          </ul>
+
+        <hr style="border-color: rgba(255,255,255,0.1);" />
+
+        <div class="footer-bottom ">
+            <p>© 2025 <strong>Storeze</strong>. All rights reserved.</p>
         </div>
-  
-        <!-- Social Media Section -->
-        <div class="col-12 col-md-4 mb-4 mb-md-5">
-          <h5 class="text-uppercase fw-bold mb-2">Connect with us</h5>
-          <div class="social-links">
-            <a href="#" class="text-white me-3"><i class="fab fa-instagram fa-lg"></i></a>
-          </div>
-        </div>
-  
-      </div>
-  
-      <hr class="my-4" style="border-top: 1px solid rgba(255, 251, 251, 0.21);" />
-  
-      <!-- Footer Bottom Section -->
-      <div class="row align-items-center text-center text-md-start">
-        <div class="col-12 col-md-6 mb-2 mb-md-0">
-          <p class="mb-0">© 2025 <strong>Storeze</strong>. All rights reserved.</p>
-        </div>
-      </div>
     </div>
 </footer>

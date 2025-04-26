@@ -332,7 +332,10 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
     message = models.TextField(null=True, blank=True)
     vendors = models.ManyToManyField(Vendor, related_name='orders', null=True,blank=True)
+    shipped = models.BooleanField(default=False)  
 
+    def __str__(self):
+        return f"Order #{self.id} - {self.first_name} {self.last_name}"
 
 
     

@@ -1,0 +1,12 @@
+{% extends 'app/base.html' %}
+{% block content %}
+<div class="container">
+    <h3 class="mb-4">Edit Variation for {{ product.product_name }}</h3>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Update Variation</button>
+        <a href="{% url 'post_product_variation' product.id %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

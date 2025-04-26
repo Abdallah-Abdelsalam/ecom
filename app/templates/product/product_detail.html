@@ -42,22 +42,47 @@
     }
 
     /* Thumbnail Container */
-    .thumbnail-container {
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-        flex-wrap: wrap;
-    }
+.thumbnail-container {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 10px 0;
+}
 
-    /* Thumbnail Images */
+/* Thumbnail Images */
+.thumbnail {
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+    cursor: pointer;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.thumbnail:hover,
+.thumbnail.active {
+    border-color: #0d6efd;
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
     .thumbnail {
-        width: 80px;
-        height: 80px;
-        cursor: pointer;
-        border: 2px solid #ddd;
-        border-radius: 4px;
-        transition: border-color 0.3s ease;
+        width: 60px;
+        height: 90px;
     }
+}
+
+@media (max-width: 480px) {
+    .thumbnail {
+        width: 60px;
+        height: 70px;
+    }
+}
 
     .thumbnail:hover {
         border-color: #333;
@@ -347,6 +372,11 @@ input[type="number"] {
         position: relative;
         display: inline-block;
     }
+    .size-btn.selected {
+        background-color: #212529;
+        color: #fff;
+        border-color: #212529;
+    }
     
 </style>
 <div class="container">
@@ -411,8 +441,8 @@ input[type="number"] {
             {% csrf_token %}
 
             <!-- Size Selection -->
-            <div class="size-selection mt-3">
-                <label for="size">Size:</label>
+            <fieldset class="size-selection mt-3">
+                <legend class="fw-semibold ">Select Size:</legend>
                 <div class="size-buttons mt-2">
                     {% for variation in product.variations.all %}
                         <button type="button" 
@@ -426,17 +456,13 @@ input[type="number"] {
                         </button>
                     {% endfor %}
                 </div>
-            </div>
+            </fieldset>
 
             <!-- Displaying Stock Based on Selected Size -->
             <div class="stock-info mt-3">
                 <p>Stock Available: 
-                    <span id="stock-count">
-                        {% if product.total_quantity > 0 %}
-                            {{ product.total_quantity }} in stock
-                        {% else %}
-                            Out of stock
-                        {% endif %}
+                    <span id="stock-count" class="fw-semibold text-dark">
+                        Select a size to view stock
                     </span>
                 </p>
             </div>
@@ -497,44 +523,51 @@ input[type="number"] {
 </div>
 
 <script>
-let selectedSize = '';
-let selectedPrice = '';
-let selectedStock = 0;
-
+    let selectedSize = '';
+    let selectedPrice = '';
+    let selectedStock = 0;
+    
     function selectSize(button, sizeName, price, stock) {
         // Remove the 'selected' class from all size buttons
         const sizeButtons = document.querySelectorAll('.size-btn');
         sizeButtons.forEach(function(btn) {
-            btn.classList.remove('selected');
+            btn.classList.remove('selected', 'btn-dark');
+            btn.classList.add('btn-outline-dark');
         });
-
-        // Add the 'selected' class to the clicked button
-        button.classList.add('selected');
-
-        // Update the selected size, price, and stock
+    
+        // Add the 'selected' style to the clicked button
+        button.classList.add('selected', 'btn-dark');
+        button.classList.remove('btn-outline-dark');
+    
+        // Update selected values
         selectedSize = sizeName;
         selectedPrice = price;
         selectedStock = stock;
-
-        // Get the product discount
-        const productDiscount = {{ product.discount }}; // Assuming product.discount is passed to template
-
-        // Calculate the discounted price based on the selected variation price
-        const discountedPrice = selectedPrice - (selectedPrice * (productDiscount / 100));
-
-        // Update the size displayed (optional: show the size name if needed)
+    
+        // Update hidden input value
         document.getElementById('selected_size').value = sizeName;
-
-        // Update the price display with the discounted price
+    
+        // Update discounted price display
+        const productDiscount = {{ product.discount|default:0 }};
+        const discountedPrice = selectedPrice - (selectedPrice * (productDiscount / 100));
         const priceDisplay = document.getElementById('updated-price');
-        priceDisplay.innerHTML = discountedPrice.toFixed(2) + ' EGP';
-
-        // Update the stock count dynamically
+        if (priceDisplay) {
+            priceDisplay.innerHTML = discountedPrice.toFixed(2) + ' EGP';
+        }
+    
+        // Update stock display
         const stockCount = document.getElementById('stock-count');
-        if (selectedStock > 0) {
-            stockCount.innerHTML = selectedStock + ' in stock';
-        } else {
-            stockCount.innerHTML = 'Out of stock';
+        if (stockCount) {
+            if (selectedStock === 0) {
+                stockCount.innerHTML = 'Out of stock';
+                stockCount.className = 'text-danger fw-semibold';
+            } else if (selectedStock < 7) {
+                stockCount.innerHTML = selectedStock + ' in stock';
+                stockCount.className = 'text-warning fw-semibold';
+            } else {
+                stockCount.innerHTML = 'Available';
+                stockCount.className = 'text-success fw-semibold';
+            }
         }
     }
 

@@ -2,30 +2,43 @@
 {% load product_tags %}
 
 {% block content %}
-<style>
 
-    /* Product Card and Wishlist Heart Icon Styles */
+<style>
+    .dm-sans {
+        font-family: "DM Sans", sans-serif;
+        font-optical-sizing: auto;
+        font-weight: 400;
+        font-style: normal;
+    }
+
     .product-card {
         border: none; /* Removed border */
         border-radius: 10px;
-        padding: 10px;
-        margin-bottom: 20px;
+        padding: 5px;
+        margin-bottom: 30px;
         transition: transform 0.3s ease;
         position: relative; /* Allow positioning of the wishlist heart icon */
         box-shadow: none; /* Removed shadow to have no frame */
     }
-
+    
+    .product-image img {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+        border-radius: 0px; /* Added border-radius to match card corners */
+    }
+    
     /* Wishlist Heart Button - Top Left */
     .wishlist-btn {
         position: absolute;
         top: 10px;
         left: 10px;
         background-color: white;
-        border: 2px solid #ddd;
-        color: #000;
+        border: 1.6px solid #ddd;
+        color: #00000;
         border-radius: 50%;
-        width: 30px;
-        height: 30px;
+        width: 24px;
+        height: 24px;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -33,35 +46,64 @@
         font-size: 14px;
         transition: background-color 0.3s ease, border-color 0.3s ease;
     }
-
+    
     .wishlist-btn:hover {
         background-color: #FFD700; /* Gold color on hover */
         border-color: #FFD700; /* Gold border on hover */
     }
-
+    
     .off {
         position: absolute;
         top: 10px;
         right: 10px;
         background-color: #DF9755;
         color: white;
-        padding: 5px;
-        border-radius: 5px;
+        padding: 4px;
+        border-radius: 15px;
+        font-size: 12px;
     }
-
+    
     .product-price {
-        font-size: 16px;
+        font-size: 12px;
         font-weight: 700;
         color: #DF9755;
-        text-align: center;
     }
+    
+    
+        .color-filter {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+    
+        .color-circle {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid #ddd;
+            cursor: pointer;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+    
+        .color-circle:hover {
+            transform: scale(1.1);
+            border-color: #000;
+        }
+    
+        .color-circle.selected {
+            border-color: #000;
+            transform: scale(1.1);
+        }
+    
 
-    /* Grid layout adjustments for products */
-    .product-grid {
+    /* Product Grid Layout */
+    .row {
         display: grid;
-        grid-template-columns: repeat(4, 1fr); /* Default to 4 products per row */
+        grid-template-columns: repeat(4, 1fr); /* 4 products per row on desktop */
         gap: 15px; /* Adjust the spacing between products */
         width: 100%;
+        margin-top: 2.6rem; /* Add space between the heading and the product grid */
     }
 
     .product-card {
@@ -70,54 +112,31 @@
 
     /* Mobile View */
     @media (max-width: 991px) {
-        /* Grid for smaller screens (2 products per row) */
-        .product-grid {
+        .row {
             grid-template-columns: repeat(2, 1fr); /* 2 products per row on mobile */
         }
-
-        .product-card {
-            margin-bottom: 1.5rem; /* Remove margin for a clean layout */
-        }
-    }
-
-    /* Tablet View (for medium screens) */
-    @media (max-width: 767px) {
-        /* Grid for smaller screens (1 product per row) */
-        .product-grid {
-            grid-template-columns: 1fr; /* 1 product per row on tablet and below */
-        }
-
-        h1 {
-            font-size: 1.3rem; /* Adjust the heading size for mobile */
-            padding: 15px 0; /* Adjust padding for mobile */
-        }
-
-        .product-price {
-            font-size: 14px; /* Smaller font for mobile */
-        }
         .badgy{
-            font-size: 1.7rem; /* Adjust the font size of the badge */
-            bottom: 4.5rem; /* Adjust the position of the badge */
-            left: 0.5rem; /* Adjust the position of the badge */
+            font-size: 0.7rem; /* Adjust the font size of the badge */
+            bottom: 4rem; /* Adjust the position of the badge */
         }
     }
 
-    /* Desktop View (large screens) */
+    /* Desktop View */
     @media (min-width: 992px) {
-        /* Keep the grid with 4 items per row */
-        .product-grid {
-            grid-template-columns: repeat(4, 1fr); /* 4 products per row */
+        .col-md-5 {
+            width: 80%; /* Product list takes 80% width on larger screens */
         }
 
-        h1 {
-            font-size: 1.8rem; /* Larger font size on desktop */
+        .col-md-7 {
+            width: 20%; /* Sidebar filter (if needed) takes 20% width on larger screens */
         }
         .badgy{
-            font-size: 1.7rem; /* Adjust the font size of the badge */
-            bottom: 4.5rem; /* Adjust the position of the badge */
-            left: 0.5rem; /* Adjust the position of the badge */
+            font-size: 0.7rem; /* Adjust the font size of the badge */
+            bottom: 4rem; /* Adjust the position of the badge */
         }
-    }    
+    }
+
+    
     .breadcrumb-item a {
         text-decoration: none;
         color: #007bff;
@@ -139,12 +158,18 @@
         background-color: #DF9755; /* Color for the underline */
         margin: 10px auto; /* Center the underline */
     }
-    .montserrat-prod {
-        font-family: "Montserrat", sans-serif;
-        font-optical-sizing: auto;
-        font-weight: 400;
+    .tuffy-regular {
+        font-family: "Tuffy", sans-serif;
+        font-weight: 300;
         font-style: normal;
-        }
+        text-transform: uppercase;
+      }
+    .size{
+        font-family: "Tuffy", sans-serif;
+        font-weight: 400;
+        font-style: regular;
+        font-size: 0.80rem;
+    }
 
 </style>
 <div class="mt-2 mx-3">
@@ -160,43 +185,80 @@
     <h1 class="category-detail-title text-center jost-navy">{{ brand.name }}</h1>
 </div>
 
-
 {% if products %}
-    <div class="col-md-12 mb-5">
-        <div class="product-grid" id="product-list">
+    <div class="container">
+        <div class="row" id="product-list">
             <!-- Loop through products -->
             {% for i in products %}
-                <div class="product-card" data-category="{{i.main_categorys}}" data-brand="{{i.categories}}" data-color="{{i.color}}" data-price="{% call_sellprice i.price i.discount %}">
-                    <div class="product-image">
-                        <a href="{{i.get_absolute_url}}">
-                            <img src="{{i.featured_image.url}}" alt="{{i.product_name}}" class="img-fluid">
-                        </a>
-                        {% if i.total_quantity == 0 %}
-                            <span class="badge badgy bg-danger position-absolute m-2" style="font-size: 0.75rem;">Out of Stock</span>
-                        {% endif %}
-                        {% if i.discount %}
-                            <span class="off">-{{i.discount}}%</span>
-                        {% endif %}
-
-                        <!-- Wishlist Heart Icon (Top Left) -->
+            <div class="col-6 col-md-6 col-lg-3 product-card" data-category="{{ i.main_categorys }}" data-brand="{{ i.categories }}" data-price="{% call_sellprice i.price i.discount %}">
+                <div class="product-image position-relative">
+                    <a href="{{ i.get_absolute_url }}">
+                        <img src="{{ i.featured_image.url }}" alt="{{ i.product_name }}">
+                    </a>
+                
+                    {% if i.total_quantity == 0 %}
+                        <span class="badge bg-danger position-absolute bottom-0 end-0 m-2" style="font-size: 0.75rem;">Out of Stock</span>
+                    {% endif %}
+                
+                    {% if i.discount %}
+                        <span class="off">-{{ i.discount }}%</span>
+                    {% endif %}
+                
+                    {% if i.id %}
                         <div class="wishlist-btn">
-                            <a href="{% url 'add_to_wishlist' i.id %}"><i class="fa-regular fa-heart text-dark"></i></a>
+                            <a href="{% url 'add_to_wishlist' i.id %}">
+                                <i class="fa-regular fa-heart text-dark"></i>
+                            </a>
                         </div>
-                    </div>
-
-                    <h5 class="text-center mt-2 dm-sans">{{i.product_name}}</h5>
-                    <div class="product-price text-center">
-                        {% call_sellprice i.price i.discount %} EGP &nbsp;
-                        {% if i.discount %}
-                            <del class="text-secondary dm-sans">{{i.price}} EGP</del>
-                        {% endif %}
-                    </div>
+                    {% else %}
+                        <p>No product ID available</p>
+                    {% endif %}
                 </div>
+                
+                <h6 class="text-center mt-2 tuffy-regular">{{ i.product_name }}</h6>
+    
+                <!-- Display Price and Discount below the product -->
+                <div class="product-price text-center d-flex justify-content-center align-items-center gap-2">
+                    <p class="mb-0 fw-bold">
+                        EGP {% call_sellprice i.price i.discount %} 
+                    </p>
+                    {% if i.discount %}
+                        <del class="text-secondary"> EGP {{ i.price }} </del>
+                    {% endif %}
+                </div>
+    
+                <!-- Display Available Sizes below the product -->
+                <div class="product-variants mt-3 text-center">
+                    {% if i.variations.all %}
+                        <!-- Available Sizes -->
+                        <div class="sizes">
+                            <ul class="list-inline">
+                                {% for variant in i.variations.all %}
+                                    {% if forloop.counter <= 3 %}
+                                        <li class="list-inline-item" style="font-size: 0.70rem; padding: 2px 8px; border: 1px solid #ddd; border-radius: 15px; margin: 1px;"
+                                            {% if not data.in_stock %}opacity: 0.4;{% endif %}>
+                                            {{ variant.size.name }}
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                                {% if i.variations.all|length > 3 %}
+                                    <li class="list-inline-item" style="font-size: 0.85rem; padding: 5px 10px; border-radius: 4px; margin: 2px; color: #555;">
+                                        + more sizes
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    {% else %}
+                        <p>No variants available.</p>
+                    {% endif %}
+                </div>
+                
+            </div>
             {% endfor %}
         </div>
     </div>
 {% else %}
-    <p>No products available for this brand.</p>
+    <p>No products available for this category.</p>
 {% endif %}
 
 {% endblock %}

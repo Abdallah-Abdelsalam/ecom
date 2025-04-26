@@ -37,6 +37,7 @@ def frontpage(request):
     categories = Category.objects.all().order_by('-id')[0:3]
 
     product = Product.objects.filter(section__name = 'Hot Deals')
+    newproduct = Product.objects.filter(section__name = 'New arrivals')
     
 
     context= {
@@ -47,6 +48,7 @@ def frontpage(request):
         'product':product,
         'brands': brands,
         'categories': categories,
+        'newproduct': newproduct,
     }
     return render(request, 'app/frontpage.html', context)  # render the template with the context
 
@@ -54,6 +56,9 @@ def frontpage(request):
 
 
 def contact(request):
+    main_category = Main_Category.objects.all()
+    sub_category = Sub_Category.objects.all()
+    categories = Category.objects.all()
     if request.method == 'POST':
         form = ContactForm(request.POST)
         if form.is_valid():
@@ -70,7 +75,7 @@ def contact(request):
     else:
         form = ContactForm()
 
-    return render(request, 'app/contact.html', {'form': form})
+    return render(request, 'app/contact.html', {'form': form, 'main_category': main_category, 'sub_category': sub_category, 'categories': categories})
 
 def contact_thank_you(request):
     # Render a thank you page after successful form submission
@@ -88,6 +93,7 @@ def product_detail(request, slug):
     # Fetch product by slug instead of ID
     product = get_object_or_404(Product, slug=slug)
 
+    sub_category = Sub_Category.objects.all()
     # Get related products from the same brand, excluding the current product
     related_products = Product.objects.filter(Brand=product.Brand).exclude(slug=slug)
 
@@ -122,6 +128,7 @@ def product_detail(request, slug):
             'main_category': main_category,
             'products': products,
             'categories': categories,
+            'sub_category': sub_category,
             'unique_size_variations': unique_size_variations,  # Send grouped variations to the template
             'product_price': discounted_product_price,  # Pass the discounted price to the template
             'related_products': related_products,  
@@ -194,6 +201,7 @@ def Login(request):
 
 @login_required(login_url='/accounts/login/')
 def Profile(request):
+    sub_category = Sub_Category.objects.all()
     # Initialize context to include categories and main categories
     categories = Category.objects.all()
     main_category = Main_Category.objects.all()
@@ -218,6 +226,7 @@ def Profile(request):
             'categories': categories,
             'products': products,
             'main_category': main_category,
+            'sub_category': sub_category,
         }
         
         return render(request, 'profile/profile.html', context)
@@ -280,24 +289,35 @@ def PRODUCT(request):
     brand = Brand.objects.all()
     categories = Category.objects.all()
 
-    # Get the variants for each product, if applicable
     products_with_variants = []
+
     for prod in product:
-        product_price = float(prod.price) if isinstance(prod.price, str) else prod.price
         variants = prod.variations.all()
 
-        # Group variants by size
+        # Group variants by size with an in_stock flag
         size_grouped_variants = {}
+
         for variant in variants:
             size = variant.size
             if size not in size_grouped_variants:
-                size_grouped_variants[size] = []
-            size_grouped_variants[size].append(variant)
+                size_grouped_variants[size] = {
+                    'in_stock': False,
+                    'variants': []
+                }
+
+            # Mark size as in stock if any variant has stock > 0
+            if variant.stock > 0:
+                size_grouped_variants[size]['in_stock'] = True
+
+            size_grouped_variants[size]['variants'].append({
+                'variant': variant,
+                'price': float(variant.price) if isinstance(variant.price, str) else variant.price,
+                'stock': variant.stock,
+            })
 
         products_with_variants.append({
             'product': prod,
-            'size_grouped_variants': size_grouped_variants,  # Group by size instead of color
-            'variant_prices': [float(variant.price) if isinstance(variant.price, str) else variant.price for variant in variants],
+            'size_grouped_variants': size_grouped_variants,
         })
 
     context = {
@@ -310,6 +330,7 @@ def PRODUCT(request):
     }
 
     return render(request, 'product/product.html', context)
+
 
 def cart_add(request, id):
     # Get the cart from the request
@@ -401,6 +422,8 @@ def cart_clear(request):
 
 
 def cart_detail(request):
+    main_category = Main_Category.objects.all()
+    sub_category = Sub_Category.objects.all()
     categories = Category.objects.all()
     
     # Initialize the Cart instance to get the cart data from the session
@@ -431,7 +454,7 @@ def cart_detail(request):
     total_after_discount = cart_total_price - discount_amount
 
     # Calculate final total (including tax, shipping, and after applying coupon discount)
-    final_total = total_after_discount + tax + (50 if cart_total_price <= 1000 else 0)  # Add shipping if needed
+    final_total = total_after_discount + tax + (50 if cart_total_price <= 1600 else 0)  # Add shipping if needed
 
     # Store the discount and final total in session for Checkout
     request.session['coupon_discount'] = coupon_discount
@@ -451,6 +474,8 @@ def cart_detail(request):
         'valid_coupon': coupon_discount > 0,
         'coupon_code': coupon_code,
         'categories': categories,
+        'main_category': main_category,
+        'sub_category': sub_category,
     }
 
     return render(request, 'cart/cart.html', context)
@@ -494,7 +519,7 @@ def complete(request):
         total_after_discount = cart_price - discount_amount
 
         tax_rate = request.session.get('tax', 0)
-        packing_cost = 50 if total_after_discount <= 1000 else 0
+        packing_cost = 50 if total_after_discount <= 1600 else 0
         final_total = total_after_discount + tax_rate + packing_cost
 
         neworder = Order()
@@ -525,7 +550,7 @@ def complete(request):
             selected_size = item_data['selected_size']
 
             item_price_after_discount = price * (1 - coupon_discount / 100)
-            item_packing_cost = packing_cost if total_after_discount <= 1000 else 0
+            item_packing_cost = packing_cost if total_after_discount <= 1600 else 0
             total_price = item_price_after_discount + item_packing_cost
 
             order_item = OrderItem.objects.create(
@@ -604,7 +629,7 @@ def post_product(request):
     vendor = Vendor.objects.get(user=request.user)
 
     if request.method == 'POST':
-        form = ProductForm(request.POST, request.FILES)
+        form = ProductForm(request.POST or None, request.FILES or None)
 
         # Create a formset for ProductImageForm and get the images from request.FILES
         image_formset = ProductImageForm((request.POST, request.FILES) or None)
@@ -667,40 +692,40 @@ def delete_product(request, product_id):
 
 @login_required
 def post_product_variation(request, product_id):
-    # Get the product that the variation will be added to or edited
     product = get_object_or_404(Product, id=product_id)
 
-    # If the form is being submitted, handle POST request
     if request.method == 'POST':
-        # If editing an existing variation, find the specific variation
         if 'variation_id' in request.POST:
-            variation = ProductVariation.objects.get(id=request.POST['variation_id'])
+            variation = get_object_or_404(ProductVariation, id=request.POST['variation_id'], product=product)
             form = ProductVariationForm(request.POST, instance=variation)
         else:
-            # Create a new variation form and pre-fill the product field with the selected product
             form = ProductVariationForm(request.POST)
-            form.instance.product = product  # Ensure the product is set correctly
+            form.instance.product = product
 
         if form.is_valid():
-            # Save the new or updated variation
             variation = form.save(commit=False)
-            variation.product = product  # Ensure the variation is linked to the selected product
+            variation.product = product
             variation.save()
 
-            return redirect('vendor_dashboard')  # Redirect to the vendor's dashboard
+            # Update total quantity
+            total_stock = product.variations.aggregate(total=Sum('stock'))['total'] or 0
+            product.total_quantity = total_stock
+            product.save()
 
-    # If the method is GET, create a blank form or pre-fill for editing
+            return redirect('post_product_variation', product_id=product.id)
+
     else:
-        form = ProductVariationForm()
+        if 'variation_id' in request.GET:
+            variation = get_object_or_404(ProductVariation, id=request.GET['variation_id'], product=product)
+            form = ProductVariationForm(instance=variation)
+        else:
+            form = ProductVariationForm()
 
-    # Delete product functionality (separate POST request for delete)
     if request.method == 'POST' and 'delete_product' in request.POST:
-        # Ensure the current user is the vendor associated with the product
         if product.vendor.user != request.user:
             messages.error(request, "You do not have permission to delete this product.")
             return redirect('vendor_dashboard')
 
-        # Delete the product and variations related to it
         product.delete()
         messages.success(request, "Product has been deleted successfully.")
         return redirect('vendor_dashboard')
@@ -708,6 +733,37 @@ def post_product_variation(request, product_id):
     return render(request, 'vendor/post_product_variation.html', {
         'form': form,
         'product': product,
+        'variations': product.variations.all(),
+    })
+
+@login_required
+def edit_product_variation(request, variation_id):
+    variation = get_object_or_404(ProductVariation, id=variation_id)
+    product = variation.product
+
+    # Ensure the current user owns this product
+    if product.vendor.user != request.user:
+        messages.error(request, "You do not have permission to edit this variation.")
+        return redirect('vendor_dashboard')
+
+    if request.method == 'POST':
+        form = ProductVariationForm(request.POST, instance=variation)
+        if form.is_valid():
+            form.save()
+
+            # Recalculate total quantity
+            product.total_quantity = product.variations.aggregate(total=Sum('stock'))['total'] or 0
+            product.save()
+
+            messages.success(request, "Variation updated successfully.")
+            return redirect('post_product_variation', product_id=product.id)
+    else:
+        form = ProductVariationForm(instance=variation)
+
+    return render(request, 'vendor/edit_product_variation.html', {
+        'form': form,
+        'variation': variation,
+        'product': product
     })
 
 
@@ -751,22 +807,28 @@ def remove_from_wishlist(request, product_id):
 
 
 def brand_list(request):
+    main_category = Main_Category.objects.all()
+    sub_category = Sub_Category.objects.all()
     categories = Category.objects.all()
     brands = Brand.objects.all()  # Fetch all brands from the database
-    return render(request, 'brands/brand_list.html', {'brands': brands, 'categories': categories})
+    return render(request, 'brands/brand_list.html', {'brands': brands, 'categories': categories, 'main_category': main_category, 'sub_category': sub_category})
 
 
 def brand_detail(request, brand_id):
+    main_category = Main_Category.objects.all()
+    sub_category = Sub_Category.objects.all()
     categories = Category.objects.all()
     brand = get_object_or_404(Brand, pk=brand_id)
     products = brand.products.all()  # Access related products using the 'products' related_name
-    return render(request, 'brands/brand_detail.html', {'brand': brand, 'products': products, 'categories': categories})
+    return render(request, 'brands/brand_detail.html', {'brand': brand, 'products': products, 'categories': categories, 'main_category': main_category, 'sub_category': sub_category})
 
 
 
 def category_list(request):
+    main_category = Main_Category.objects.all()
+    sub_category = Sub_Category.objects.all()
     categories = Category.objects.all()  # Fetch all categories from the database
-    return render(request, 'categories/category_list.html', {'categories': categories})
+    return render(request, 'categories/category_list.html', {'categories': categories, 'main_category': main_category, 'sub_category': sub_category})
 
 
 
@@ -779,6 +841,9 @@ def category_detail(request, category_id):
 
 
 def search(request):
+    main_category = Main_Category.objects.all()
+    sub_category = Sub_Category.objects.all()
+    categories = Category.objects.all()
     query = request.GET.get('q', '')
     product_queryset = Product.objects.all()
 
@@ -810,4 +875,25 @@ def search(request):
     return render(request, 'product/search_results.html', {
         'product': product_data,  # key must match what your template uses: "product"
         'query': query,
+        'categories': categories,
+        'main_category': main_category,
+        'sub_category': sub_category,
     })
+
+@login_required
+def mark_order_shipped(request, order_id):
+    # Get the order object
+    order = get_object_or_404(Order, id=order_id)
+
+    # Check if the current user is the vendor associated with this order
+    if request.user.vendor not in order.vendors.all():
+        messages.error(request, "You do not have permission to mark this order as shipped.")
+        return redirect('vendor_dashboard')
+
+    # Mark the order as shipped
+    order.shipped = True
+    order.status = "Shipped"  # You can change the status if required
+    order.save()
+
+    messages.success(request, "Order has been marked as shipped.")
+    return redirect('vendor_dashboard')  # Or wherever you want to redirect

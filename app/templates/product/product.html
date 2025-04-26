@@ -16,22 +16,22 @@
 
 .product-image img {
     width: 100%;
-    height: 400px;
+    height: 300px;
     object-fit: cover;
-    border-radius: 10px; /* Added border-radius to match card corners */
+    border-radius: 0px; /* Added border-radius to match card corners */
 }
 
 /* Wishlist Heart Button - Top Left */
 .wishlist-btn {
     position: absolute;
-    top: 13px;
-    left: 13px;
+    top: 10px;
+    left: 10px;
     background-color: white;
-    border: 2px solid #ddd;
+    border: 1.6px solid #ddd;
     color: #00000;
     border-radius: 50%;
-    width: 30px;
-    height: 30px;
+    width: 24px;
+    height: 24px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -51,12 +51,13 @@
     right: 10px;
     background-color: #DF9755;
     color: white;
-    padding: 5px;
-    border-radius: 5px;
+    padding: 4px;
+    border-radius: 15px;
+    font-size: 12px;
 }
 
 .product-price {
-    font-size: 16px;
+    font-size: 12px;
     font-weight: 700;
     color: #DF9755;
 }
@@ -116,12 +117,6 @@
         right:42px;
         top:30px;
     }
-    .dm-sans {
-        font-family: "DM Sans", sans-serif;
-        font-optical-sizing: auto;
-        font-weight: 400;
-        font-style: normal;
-      }
     
       @media (min-width: 992px) {
         .col-md-3 {
@@ -157,9 +152,46 @@
             width: 100%;
         }
     }
+    .tuffy-regular {
+        font-family: "Tuffy", sans-serif;
+        font-weight: 300;
+        font-style: normal;
+        text-transform: uppercase;
+      }
+    .size{
+        font-family: "Tuffy", sans-serif;
+        font-weight: 400;
+        font-style: regular;
+        font-size: 0.80rem;
+    }
+    .modern-heading {
+        font-family: 'Jost', 'Segoe UI', sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #333;
+    }
+    
+    .modern-heading::after {
+        content: "";
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(90deg,rgb(222, 165, 53),rgb(255, 255, 255));
+        display: block;
+        margin: 10px auto 0;
+        border-radius: 2px;
+        transition: width 0.3s ease;
+    }
+    
+    .modern-heading:hover::after {
+        width: 120px;
+    }
+    
 </style>
 
 <body>
+    <h1 class="text-center my-4 fw-bold display-5 position-relative modern-heading">
+        <span style="color:#DF9755">All</span> Products
+    </h1>
 
 <button class="btn btn-transparent d-lg-none d-xl-block d-xl-none d-xxl-block d-xxl-none" type="button" onclick="toggleFilterSidebar()" style="left:0;">
     <i class="fa fa-sliders me-2"></i>Filter <!-- Added margin to the icon -->
@@ -245,34 +277,44 @@
                         {% endif %}
                     </div>
                     
-                    <h5 class="text-center mt-2 dm-sans">{{ product_item.product.product_name }}</h5>
-                    <div class="product-price text-center">
-                        <!-- Display the main product price -->
-                        <p>{% call_sellprice product_item.product.price product_item.product.discount %} EGP</p>
-                        
+                    <h6 class="text-center mt-2 tuffy-regular ">{{ product_item.product.product_name }}</h6>
+                    <div class="product-price text-center d-flex justify-content-center align-items-center gap-2">
+                        <p class="mb-0 fw-bold">
+                            EGP {% call_sellprice product_item.product.price product_item.product.discount %} 
+                        </p>
+                    
                         {% if product_item.product.discount %}
-                        <del class="text-secondary dm-sans">{{ product_item.product.price }} EGP</del>
+                        <del class="text-secondary mb-0"> EGP {{ product_item.product.price }}</del>
                         {% endif %}
                     </div>
                 
                     <!-- Show available sizes below product -->
                     <div class="product-variants mt-3 text-center">
                         {% if product_item.size_grouped_variants %}
-                            <!-- Display Available Sizes -->
                             <div class="sizes">
-                                <strong>Sizes:</strong>
-                                <ul class="list-inline">
-                                    {% for size, variants in product_item.size_grouped_variants.items %}
-                                        <li class="list-inline-item" style="font-size: 0.85rem; padding: 5px 10px; border: 1px solid #ddd; border-radius: 4px; margin: 2px;">
-                                            {{ size.name }} <!-- Display the size name -->
-                                        </li>
+                                <ul class="list-inline d-inline">
+                                    {% for size, data in product_item.size_grouped_variants.items %}
+                                        {% if forloop.counter <= 3 %}
+                                            <li class="list-inline-item"
+                                                style="font-size: 0.70rem; padding: 2px 8px; border: 1px solid #ddd;
+                                                       border-radius: 15px; margin: 1px;
+                                                       {% if not data.in_stock %}opacity: 0.4;{% endif %}">
+                                                {{ size.name }}
+                                            </li>
+                                        {% endif %}
                                     {% endfor %}
+                                    {% if product_item.size_grouped_variants|length > 3 %}
+                                        <li class="list-inline-item" style="font-size: 0.85rem; padding: 2px 8px; border-radius: 15px; margin: 1px; color: #555;">
+                                            + more sizes
+                                        </li>
+                                    {% endif %}
                                 </ul>
                             </div>
                         {% else %}
                             <p>No variants available.</p>
                         {% endif %}
                     </div>
+                                        
                 </div>
                 {% endfor %}
             </div>
@@ -281,7 +323,7 @@
 </div>
 
 <!-- Sidebar Filter Section -->
-<div class="container-fluid mt-5 d-none d-lg-flex">
+<div class="container-fluid mt-1 d-none d-lg-flex">
     <div class="row mt-2">
         <!-- Filter Sidebar on the left -->
         <div class="col-md-3 filter-sidebar bg-light p-4 rounded shadow-sm" style="font-family: 'Jost', sans-serif;">
@@ -347,15 +389,15 @@
                         {% endif %}
                     </div>
                     
-                    <h5 class="text-center mt-2 dm-sans">{{ i.product.product_name }}</h5>
+                    <h6 class="text-center mt-2 tuffy-regular">{{ i.product.product_name }}</h6>
         
                     <!-- Display Price and Discount below the product -->
                     <div class="product-price text-center">
                         <p>
-                            {% call_sellprice i.product.price i.product.discount %} EGP
+                            EGP {% call_sellprice i.product.price i.product.discount %} 
                         </p>
                         {% if i.product.discount %}
-                            <del class="text-secondary">{{ i.product.price }} EGP</del>
+                            <del class="text-secondary"> EGP {{ i.product.price }} </del>
                         {% endif %}
                     </div>
         
@@ -364,19 +406,26 @@
                         {% if i.product.variations.all %}
                             <!-- Available Sizes -->
                             <div class="sizes">
-                                <strong>Sizes:</strong>
                                 <ul class="list-inline">
                                     {% for variant in i.product.variations.all %}
-                                        <li class="list-inline-item" style="font-size: 0.85rem; padding: 5px 10px; border: 1px solid #ddd; border-radius: 4px; margin: 2px;">
-                                            {{ variant.size.name }}
-                                        </li>
+                                        {% if forloop.counter <= 3 %}
+                                            <li class="list-inline-item" style="font-size: 0.85rem; padding: 5px 10px; border: 1px solid #ddd; border-radius: 4px; margin: 2px;">
+                                                {{ variant.size.name }}
+                                            </li>
+                                        {% endif %}
                                     {% endfor %}
+                                    {% if i.product.variations.all|length > 3 %}
+                                        <li class="list-inline-item" style="font-size: 0.85rem; padding: 5px 10px; border-radius: 4px; margin: 2px; color: #555;">
+                                            + more sizes
+                                        </li>
+                                    {% endif %}
                                 </ul>
                             </div>
                         {% else %}
                             <p>No variants available.</p>
                         {% endif %}
                     </div>
+                    
                 </div>
                 {% endfor %}
             </div>
