@@ -833,10 +833,11 @@ def category_list(request):
 
 
 def category_detail(request, category_id):
+    sub_category = Sub_Category.objects.all()
     categories = Category.objects.all()
     category = get_object_or_404(Category, pk=category_id)
     products = category.products.all()  # Access related products using the 'products' related_name
-    return render(request, 'categories/category_detail.html', {'category': category, 'products': products, 'categories': categories})
+    return render(request, 'categories/category_detail.html', {'category': category, 'products': products, 'categories': categories, 'sub_category': sub_category})
 
 
 

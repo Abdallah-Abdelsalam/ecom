@@ -170,6 +170,69 @@
         font-style: regular;
         font-size: 0.80rem;
     }
+    /* Side Navigation (Filter Sidebar) */
+    #filterSidebar {
+        position: fixed;
+        top: -5px;
+        left: -400px; /* Hide sidebar by default */
+        width: 300px;
+        height: 105vh;
+        background-color: #f8f9fa;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1)
+        transition: left 0.3s ease;
+        z-index: 1000;
+    }
+
+    #filterSidebar.filter-sidebar-open {
+        left: 0; /* Show sidebar when open */
+    }
+
+    .filter-sidebar-content {
+        padding: 10px;
+        overflow-y: auto;
+        height: 100%;
+    }
+
+    .btn-close{
+        position: absolute;
+        right:42px;
+        top:30px;
+    }
+    
+      @media (min-width: 992px) {
+        .col-md-3 {
+            width: 25%; /* Sidebar takes 25% of the width on large screens */
+        }
+    
+        .col-md-9 {
+            width: 75%; /* Product list takes 75% of the width on large screens */
+        }
+        .filter-sidebar-content {
+            max-width: 320px;
+        }
+    }
+    
+    .filter-sidebar-content {
+        background-color: #f8f9fa;
+        font-family: 'Jost', sans-serif;
+        max-width: 300px; /* wider sidebar */
+        width: 100%;
+    }
+    
+    .filter-sidebar-content h6 {
+        font-weight: 600;
+    }
+    
+    .filter-sidebar-content label {
+        font-weight: 400;
+        font-size: 0.95rem;
+    }
+    @media (max-width: 768px) {
+        .filter-sidebar-content {
+            font-family: 'Jost', sans-serif;
+            width: 100%;
+        }
+    }
 
 </style>
 <div class="mt-2 mx-3">
@@ -184,81 +247,207 @@
 <div class="mx-3">
     <h1 class="category-detail-title text-center jost-navy">{{ category.name }}</h1>
 </div>
+<button class="btn btn-transparent d-lg-none d-xl-block d-xl-none d-xxl-block d-xxl-none" type="button" onclick="toggleFilterSidebar()" style="left:0;">
+    <i class="fa fa-sliders me-2"></i>Filter <!-- Added margin to the icon -->
+</button>
 
-{% if products %}
-    <div class="container">
-        <div class="row" id="product-list">
-            <!-- Loop through products -->
-            {% for i in products %}
-            <div class="col-6 col-md-6 col-lg-3 product-card" data-category="{{ i.main_categorys }}" data-brand="{{ i.categories }}" data-price="{% call_sellprice i.price i.discount %}">
-                <div class="product-image position-relative">
-                    <a href="{{ i.get_absolute_url }}">
-                        <img src="{{ i.featured_image.url }}" alt="{{ i.product_name }}">
-                    </a>
-                
-                    {% if i.total_quantity == 0 %}
-                        <span class="badge bg-danger position-absolute bottom-0 end-0 m-2" style="font-size: 0.75rem;">Out of Stock</span>
-                    {% endif %}
-                
-                    {% if i.discount %}
-                        <span class="off">-{{ i.discount }}%</span>
-                    {% endif %}
-                
-                    {% if i.id %}
-                        <div class="wishlist-btn">
-                            <a href="{% url 'add_to_wishlist' i.id %}">
-                                <i class="fa-regular fa-heart text-dark"></i>
-                            </a>
-                        </div>
-                    {% else %}
-                        <p>No product ID available</p>
-                    {% endif %}
+        <!-- Side Navigation (Filter Sidebar) -->
+        <div id="filterSidebar" class="filter-sidebar">
+            <div class="filter-sidebar-content bg-light p-4 rounded shadow-sm mt-2" style="font-family: 'Jost', sans-serif;">
+                <div class="d-flex justify-content-end mb-2">
+                    <button class="btn-close" onclick="toggleFilterSidebar()"></button>
                 </div>
-                
-                <h6 class="text-center mt-2 tuffy-regular">{{ i.product_name }}</h6>
-    
-                <!-- Display Price and Discount below the product -->
-                <div class="product-price text-center d-flex justify-content-center align-items-center gap-2">
-                    <p class="mb-0 fw-bold">
-                        EGP {% call_sellprice i.price i.discount %} 
-                    </p>
-                    {% if i.discount %}
-                        <del class="text-secondary"> EGP {{ i.price }} </del>
-                    {% endif %}
+            
+                <h6 class="mb-2 mt-5">Sort By Price</h6>
+                <select id="sort-by" class="form-control mb-3" onchange="applyFilters()">
+                    <option value="default">Sort by</option>
+                    <option value="low-high">Price: Low to High</option>
+                    <option value="high-low">Price: High to Low</option>
+                </select>
+            
+                <hr class="my-3">
+            
+                <h6 class="mb-2">Filter By Price</h6>
+                <div class="form-group mb-3">
+                    <label for="minPrice">Min Price</label>
+                    <input type="number" class="form-control" id="minPrice" placeholder="Min">
                 </div>
-    
-                <!-- Display Available Sizes below the product -->
-                <div class="product-variants mt-3 text-center">
-                    {% if i.variations.all %}
-                        <!-- Available Sizes -->
-                        <div class="sizes">
-                            <ul class="list-inline">
-                                {% for variant in i.variations.all %}
-                                    {% if forloop.counter <= 3 %}
-                                        <li class="list-inline-item" style="font-size: 0.70rem; padding: 2px 8px; border: 1px solid #ddd; border-radius: 15px; margin: 1px;"
-                                            {% if not data.in_stock %}opacity: 0.4;{% endif %}>
-                                            {{ variant.size.name }}
-                                        </li>
-                                    {% endif %}
-                                {% endfor %}
-                                {% if i.variations.all|length > 3 %}
-                                    <li class="list-inline-item" style="font-size: 0.85rem; padding: 5px 10px; border-radius: 4px; margin: 2px; color: #555;">
-                                        + more sizes
-                                    </li>
-                                {% endif %}
-                            </ul>
-                        </div>
-                    {% else %}
-                        <p>No variants available.</p>
-                    {% endif %}
+                <div class="form-group mb-4">
+                    <label for="maxPrice">Max Price</label>
+                    <input type="number" class="form-control" id="maxPrice" placeholder="Max">
                 </div>
-                
+            
+                <span onclick="toggleFilterSidebar()" class="d-lg-none d-xl-block d-xl-none d-xxl-block d-xxl-none">
+                    <button class="btn btn-dark w-100" onclick="applyFilters()">Apply Filter</button>
+                </span>
             </div>
-            {% endfor %}
         </div>
-    </div>
-{% else %}
-    <p>No products available for this category.</p>
-{% endif %}
 
+        {% if products %}
+            <div class="container">
+                <div class="row" id="product-list">
+                    <!-- Loop through products -->
+                    {% for i in products %}
+                    <div class="col-6 product-card" data-category="{{ i.main_categories }}" data-brand="{{ i.categories }}" data-price="{% call_sellprice i.price i.discount %}">
+                        <div class="product-image position-relative">
+                            <a href="{{ i.get_absolute_url }}">
+                                <img src="{{ i.featured_image.url }}" alt="{{ i.product_name }}">
+                            </a>
+                        
+                            {% if i.total_quantity == 0 %}
+                                <span class="badge bg-danger position-absolute bottom-0 end-0 m-2" style="font-size: 0.75rem;">Out of Stock</span>
+                            {% endif %}
+                        
+                            {% if i.discount %}
+                                <span class="off">-{{ i.discount }}%</span>
+                            {% endif %}
+                        
+                            {% if i.id %}
+                                <div class="wishlist-btn">
+                                    <a href="{% url 'add_to_wishlist' i.id %}">
+                                        <i class="fa-regular fa-heart text-dark"></i>
+                                    </a>
+                                </div>
+                            {% else %}
+                                <p>No product ID available</p>
+                            {% endif %}
+                        </div>
+                        
+                        <h6 class="text-center mt-2 tuffy-regular">{{ i.product_name }}</h6>
+            
+                        <!-- Display Price and Discount below the product -->
+                        <div class="product-price text-center d-flex justify-content-center align-items-center gap-2">
+                            <p class="mb-0 fw-bold">
+                                EGP {% call_sellprice i.price i.discount %} 
+                            </p>
+                            {% if i.discount %}
+                                <del class="text-secondary"> EGP {{ i.price }} </del>
+                            {% endif %}
+                        </div>
+            
+                        <!-- Display Available Sizes below the product -->
+                        <div class="product-variants mt-3 text-center">
+                            {% if i.variations.all %}
+                                <!-- Available Sizes -->
+                                <div class="sizes">
+                                    <ul class="list-inline">
+                                        {% for variant in i.variations.all %}
+                                            {% if forloop.counter <= 3 %}
+                                                <li class="list-inline-item" style="font-size: 0.70rem; padding: 2px 8px; border: 1px solid #ddd; border-radius: 15px; margin: 1px;"
+                                                    {% if not data.in_stock %}opacity: 0.4;{% endif %}>
+                                                    {{ variant.size.name }}
+                                                </li>
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% if i.variations.all|length > 3 %}
+                                            <li class="list-inline-item" style="font-size: 0.85rem; padding: 5px 10px; border-radius: 4px; margin: 2px; color: #555;">
+                                                + more sizes
+                                            </li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                            {% else %}
+                                <p>No variants available.</p>
+                            {% endif %}
+                        </div>
+                        
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% else %}
+            <p>No products available for this category.</p>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    function applyFilters() {
+        const brandFilter = [];
+        const colorFilter = [];
+        const sortBy = document.getElementById("sort-by").value;
+    
+        {% for i in sub_category %}
+            if (document.getElementById("{{i.name}}") && document.getElementById("{{i.name}}").checked) {
+                brandFilter.push("{{i.name}}");
+            }
+        {% endfor %}
+    
+        // Get selected colors
+        const colorCircles = document.querySelectorAll(".color-circle.selected");
+        colorCircles.forEach(circle => {
+            colorFilter.push(circle.getAttribute("data-color"));
+        });
+
+        // Get price range
+        const minPrice = parseFloat(document.getElementById("minPrice").value) || 0;
+        const maxPrice = parseFloat(document.getElementById("maxPrice").value) || Infinity;
+    
+        // Filter products
+        const products = document.querySelectorAll(".product-card");
+        products.forEach(product => {
+            const productBrand = product.getAttribute("data-brand");
+            const productColor = product.getAttribute("data-color");
+            const productPrice = parseFloat(product.getAttribute("data-price"));
+            let visible = true;
+    
+            // Brand filter
+            if (brandFilter.length > 0 && !brandFilter.includes(productBrand)) {
+                visible = false;
+            }
+    
+            // Price filter
+            if (productPrice < minPrice || productPrice > maxPrice) {
+                visible = false;
+            }
+    
+            // Color filter
+            if (colorFilter.length > 0 && !colorFilter.includes(productColor)) {
+                visible = false;
+            }
+    
+            // Update visibility
+            if (visible) {
+                product.style.display = "block";
+            } else {
+                product.style.display = "none";
+            }
+        });
+    
+        // Sort products
+        const productList = document.getElementById("product-list");
+        let productItems = Array.from(productList.children);
+        if (sortBy === "low-high") {
+            productItems.sort((a, b) => parseFloat(a.getAttribute("data-price")) - parseFloat(b.getAttribute("data-price")));
+        } else if (sortBy === "high-low") {
+            productItems.sort((a, b) => parseFloat(b.getAttribute("data-price")) - parseFloat(a.getAttribute("data-price")));
+        }
+
+        // Update the product list
+        productList.replaceChildren(...productItems);
+
+        // Add click event to color circles
+        document.querySelectorAll(".color-circle").forEach(circle => {
+            circle.addEventListener("click", function (e) {
+                e.preventDefault(); // Prevent default link behavior
+                this.classList.toggle("selected"); // Toggle selected class
+                applyFilters(); // Apply filters
+            });
+        });
+    }
+    
+    // Initial call to apply filters on page load
+    window.onload = applyFilters;
+
+    function toggleFilterSidebar() {
+        const sidebar = document.getElementById("filterSidebar");
+        sidebar.classList.toggle("filter-sidebar-open");
+    }
+    document.addEventListener("click", function (event) {
+        const sidebar = document.getElementById("filterSidebar");
+        if (!sidebar.contains(event.target) && !event.target.matches('.btn-transparent')) {
+            sidebar.classList.remove("filter-sidebar-open");
+        }
+    });
+</script>
 {% endblock %}
