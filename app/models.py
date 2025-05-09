@@ -9,6 +9,7 @@ from django.db.models.signals import pre_save
 from PIL import Image
 from django.core.files.base import ContentFile
 from io import BytesIO
+from django.db import models
 
 
 class slider(models.Model):
@@ -181,21 +182,21 @@ class Product(models.Model):
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, related_name='products', null=True, blank=True)  # Link product to a vendor
     availability = models.IntegerField(null=True)
     featured_image = models.ImageField(upload_to='media/product_imgs', max_length=255, blank=True, null=True)
-    product_name = models.CharField(max_length=100)
+    product_name = models.CharField(max_length=600)
     Brand = models.ForeignKey(Brand, related_name='products', on_delete=models.CASCADE, null=True)
     price = models.IntegerField()
     discount = models.IntegerField()
     tax = models.IntegerField(null=True)
     variant = models.CharField(max_length=10, choices=VARIANTS, default='None')
     packing_cost = models.IntegerField(null=True)
-    product_information = models.CharField(max_length=500, null=True)
-    model_name = models.CharField(max_length=100)
+    product_information = models.CharField(max_length=900, null=True)
+    model_name = models.CharField(max_length=900)
     categories = models.ForeignKey(Category, related_name='products', on_delete=models.CASCADE)
     color = models.ManyToManyField(Color, related_name='products', null=True)
-    tags = models.CharField(max_length=100)
-    description = models.CharField(max_length=500, null=True)
+    tags = models.CharField(max_length=900)
+    description = models.CharField(max_length=900, null=True)
     section = models.ForeignKey(Section, on_delete=models.DO_NOTHING)
-    slug = models.SlugField(default='', max_length=500, null=True, blank=True)
+    slug = models.SlugField(default='', max_length=900, null=True, blank=True)
     main_categorys = models.ForeignKey(Main_Category, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
@@ -269,13 +270,53 @@ def pre_save_post_receiver(sender, instance, *args,**kwargs):
 pre_save.connect(pre_save_post_receiver, Product)
 
 
-    
 class Product_Image(models.Model):
-    product = models.ForeignKey(Product,on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='media/product_imgs')
 
+    def save(self, *args, **kwargs):
+        # Compress the image if it exists
+        if self.image:
+            self.compress_image()
 
-from django.db import models
+        super().save(*args, **kwargs)
+
+    def compress_image(self):
+        """
+        Compress the product image, reduce its size and quality, and save it.
+        """
+        # Open image using PIL
+        image = Image.open(self.image)
+        image = image.convert('RGB')  # Convert to RGB to avoid issues with formats like PNG
+
+        # Resize the image to maintain aspect ratio (optional step)
+        image = self.resize_image(image, max_width=900, max_height=900)
+
+        # Compress and save to memory in WebP format
+        buffer = BytesIO()
+        image.save(buffer, format='WEBP', quality=70)  # Save as WebP with compression
+        buffer.seek(0)
+
+        # Set new image to the image field with a clean name
+        file_name = self.image.name.rsplit('.', 1)[0] + '.webp'
+        self.image.save(file_name, ContentFile(buffer.read()), save=False)
+
+    def resize_image(self, img, max_width, max_height):
+        """
+        Resize the image while maintaining aspect ratio.
+        """
+        width, height = img.size
+        if width > max_width or height > max_height:
+            ratio = min(max_width / width, max_height / height)
+            new_width = int(width * ratio)
+            new_height = int(height * ratio)
+            img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)  # Updated for Pillow 10+
+        return img
+
+    class Meta:
+        db_table = "app_Product_Image"
+
+
 
 class ProductVariation(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='variations')
@@ -362,3 +403,4 @@ class ProductColor (models.Model):
 
     def __str__(self):
         return f"{self.product.product_name} - {self.color.name}"
+        

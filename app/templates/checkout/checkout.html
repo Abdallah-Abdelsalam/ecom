@@ -220,12 +220,11 @@ h3, .form-label {
                         <div class="divider"></div>
 
                         <div class="d-flex justify-content-between align-items-center">
-                            <span>shipping:</span>
-                            {% if cart_total_price > 1600 %}
+                             <span>shipping:</span>
+                            {% comment%}{% if cart_total_price > 1600 %}
                             <span class="text-success">Free</span>
-                            {% else %}
-                            <span>EGP 50</span>
-                            {% endif %}
+                            {% else %} {% endcomment %}
+                            <span>EGP 80</span>
                         </div>
                         <div class="divider"></div>
 
@@ -279,7 +278,7 @@ h3, .form-label {
     // Get values from context passed to the template
     var item_amounts = {{ cart_total_price }};  // Initial cart total (before discount)
     var tax = {{ tax }};                         // Tax value
-    var shipping_fee = {% if cart_total_price <= 1600 %} 50 {% else %} 0 {% endif %};
+    var shipping_fee =  80;
     var coupon_discount = {{ coupon_discount }};  // Coupon discount percentage
 
     // Calculate the total price after coupon discount

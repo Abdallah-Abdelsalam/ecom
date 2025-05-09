@@ -326,7 +326,10 @@
         <tbody>
             {% for product in products %}
             <tr>
-                <td>{{ product.product_name }}
+                <td>
+                    <a href="{% url 'edit_product' product.id %}" class="fw-semibold text-decoration-none">
+                        {{ product.product_name }}
+                    </a>
                     {% if product.total_quantity < 5 %}
                         <i class="bi bi-exclamation-triangle-fill text-warning ms-1" title="Low stock"></i>
                     {% endif %}

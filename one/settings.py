@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "app",
     "cart",
     'widget_tweaks',
+    'compressor',
 ]
 
 CART_SESSION_ID = 'cart'

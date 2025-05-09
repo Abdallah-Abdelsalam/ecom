@@ -521,7 +521,8 @@ input[type="number"] {
 
 
 </div>
-
+{% load compress %}
+{% compress js %}
 <script>
     let selectedSize = '';
     let selectedPrice = '';
@@ -612,6 +613,6 @@ document.querySelector('.arrow-right').addEventListener('click', function() {
 });
 
 </script>
-
+{% endcompress %}
 
 {% endblock %}    

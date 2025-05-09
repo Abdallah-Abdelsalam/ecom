@@ -95,12 +95,14 @@
         <h3>Product Images</h3>
         {{ variation_form.as_p }}
         
-        <div>
-            <label for="id_image">Product Images</label>
-            {{ image_formset.as_p }}  <!-- Render formset for multiple images -->
+        <div class="mb-3">
+            <label for="id_image" class="form-label">Add New Images</label>
+            <input type="file" name="image" id="id_image" class="form-control" multiple>
         </div>
-    
-        <button type="submit" class="submit-button">Post Product</button>
+
+        <button type="submit" class="submit-button btn btn-primary">
+            {% if product %}Update Product{% else %}Post Product{% endif %}
+        </button>
     </form>
 </div>
 

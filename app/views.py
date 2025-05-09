@@ -454,7 +454,7 @@ def cart_detail(request):
     total_after_discount = cart_total_price - discount_amount
 
     # Calculate final total (including tax, shipping, and after applying coupon discount)
-    final_total = total_after_discount + tax + (50 if cart_total_price <= 1600 else 0)  # Add shipping if needed
+    final_total = total_after_discount + tax + 80 # Add shipping if needed
 
     # Store the discount and final total in session for Checkout
     request.session['coupon_discount'] = coupon_discount
@@ -519,7 +519,7 @@ def complete(request):
         total_after_discount = cart_price - discount_amount
 
         tax_rate = request.session.get('tax', 0)
-        packing_cost = 50 if total_after_discount <= 1600 else 0
+        packing_cost = 80
         final_total = total_after_discount + tax_rate + packing_cost
 
         neworder = Order()
@@ -550,7 +550,7 @@ def complete(request):
             selected_size = item_data['selected_size']
 
             item_price_after_discount = price * (1 - coupon_discount / 100)
-            item_packing_cost = packing_cost if total_after_discount <= 1600 else 0
+            item_packing_cost = packing_cost
             total_price = item_price_after_discount + item_packing_cost
 
             order_item = OrderItem.objects.create(
@@ -670,6 +670,52 @@ def post_product(request):
         image_formset = ProductImageForm()  # Initialize empty formset for images
 
     return render(request, 'vendor/post_product.html', {'form': form, 'image_formset': image_formset})
+
+@login_required
+def edit_product(request, product_id):
+    vendor = Vendor.objects.get(user=request.user)
+    product = get_object_or_404(Product, id=product_id, vendor=vendor)
+
+    if request.method == 'POST':
+        form = ProductForm(request.POST, request.FILES, instance=product)
+
+        if form.is_valid():
+            product = form.save(commit=False)
+            product.Brand = vendor.brand
+            product.vendor = vendor
+            product.packing_cost = product.packing_cost or 0
+            product.tax = product.tax or 0
+
+            if not product.section:
+                new_arrival_section = Section.objects.get(name='New arrivals')
+                product.section = new_arrival_section
+
+            name_slug = slugify(product.product_name)
+            modal_name = name_slug.replace('-', ', ')
+            description_slug = slugify(product.description)
+            product.product_information = description_slug
+            product.model_name = modal_name
+
+            if not product.tags:
+                tags = slugify(product.description).replace('-', ', ')
+                product.tags = tags
+
+            product.save()
+
+            # ✅ Handle multiple images manually
+            for image in request.FILES.getlist('image'):
+                Product_Image.objects.create(product=product, image=image)
+
+            return redirect('vendor_dashboard')
+
+    else:
+        form = ProductForm(instance=product)
+
+    return render(request, 'vendor/post_product.html', {
+        'form': form,
+        'product': product,
+    })
+
 
 @login_required
 def delete_product(request, product_id):

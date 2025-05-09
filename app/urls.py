@@ -45,6 +45,9 @@ urlpatterns = [
     path('complete/', views.complete,name="complete"),
     path('dashboard/', views.vendor_dashboard, name='vendor_dashboard'),
     path('post-product/', views.post_product, name='post_product'),
+
+    path('product/edit/<int:product_id>/', views.edit_product, name='edit_product'),
+
     path('post-product-variation/<int:product_id>/', views.post_product_variation, name='post_product_variation'),
     path('product/<int:product_id>/delete/', views.delete_product, name='delete_product'),
     path('variation/edit/<int:variation_id>/', views.edit_product_variation, name='edit_product_variation'),

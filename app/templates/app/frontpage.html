@@ -251,39 +251,51 @@
 .banner {
     position: relative;
     width: 100%;
-    height: 64vh; /* Full viewport height */
+    height: 64vh;
     overflow: hidden;
 }
 
 .banner img {
     width: 100%;
-    height: 100%;
-    object-fit: cover; /* Ensures the image covers the section without distortion */
+    height: 80vh;
+    object-fit: cover;
 }
 
-/* Content inside the banner */
 .banner-content {
     position: absolute;
-    top: 58%;
+    top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%); /* Center content both vertically and horizontally */
+    transform: translate(-50%, -50%);
     color: #fff;
     text-align: center;
     max-width: 100%;
     display: flex;
-    flex-direction: column; /* Stack the elements vertically */
-    gap: 80px; /* Add space between elements */
+    flex-direction: column;
+    align-items: center;
+    gap: 20px; /* Reduced spacing between elements */
 }
 
+/* Headline */
 .banner-title {
     font-size: 3.5rem;
     font-weight: 700;
     line-height: 1.2;
+    margin-bottom: 20%; /* Remove top margin */
 }
 
+/* Subtitle */
 .banner-subtitle {
     font-size: 1.5rem;
     font-weight: 400;
+    margin-bottom: 0.5rem;
+}
+
+/* Tagline */
+.banner-tagline {
+    font-size: 0.9rem;
+    color: white;
+    margin: 0;
+    font-family: 'Courier New', Courier, monospace;
 }
 
 .btn-shop-now {
@@ -301,16 +313,26 @@
     transform: translateY(-5px); /* Slight lift effect */
 }
 
-/* Media query for mobile responsiveness */
+/* Responsive Design */
 @media (max-width: 767px) {
+    .banner {
+        height: 80vh; /* Adjust height for mobile */
+    }
+
     .banner-title {
         font-size: 2.5rem;
+        margin-bottom: 50%; /* Adjust spacing for mobile */
     }
 
     .banner-subtitle {
         font-size: 1.2rem;
-        margin-left: 1rem;
-        padding-right: 0;
+        margin-left: 0.5rem;
+        margin-right: 0.5rem;
+    }
+
+    .banner-content {
+        gap: 15px; /* Smaller gap on mobile */
+        padding: 0 1rem;
     }
 
     .btn-shop-now {
@@ -449,10 +471,8 @@
         font-weight: 600;
         font-style: normal;
         font-size: 2rem;
-        text-align: center;
         text-transform: uppercase;
         letter-spacing: 1px;
-        margin-top: 12rem;
       }
 }
 
@@ -622,23 +642,27 @@
 
 </style>
 
- <!-- Banner Section -->
+<!-- Banner Section -->
 <section class="banner">
-    <!-- Replace with your image URL -->
-    <img src="https://images.pexels.com/photos/15481196/pexels-photo-15481196/free-photo-of-not-expected.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="Banner Image">
+    <img src="https://images.pexels.com/photos/15481196/pexels-photo-15481196/free-photo-of-not-expected.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="Banner Image" class="img-fluid">
 
-    <div class="container banner-content mt-2">
-        <h1 class="jost-title mt-5">Welcome to Our Store</h1>
-        <p class="banner-subtitle mt-5">Exclusive Deals Just for You!</p>
-        <div class="d-flex gap-1 justify-content-center mb-2">
+    <div class="container banner-content">
+        <h1 class="banner-title jost-title">WELCOME TO OUR STORE</h1>
+        <p class="banner-subtitle">Exclusive Deals Just for You!</p>
+
+        <p class="tuffy-regular banner-tagline">Discover, Compare, Buy</p>
+
+        <div class="d-flex flex-wrap gap-2 justify-content-center">
             {% for i in categories %}
             <a href="{% url 'category_detail' i.id %}">
-                <p class="btn btn-category jost-shop mb-0">SHOP {{ i.name }}</p>
+                <p class="btn btn-category btn-shop-now jost-shop mb-0">SHOP {{ i.name }}</p>
             </a>
             {% endfor %}
         </div>
     </div>
 </section>
+
+
 
 <div class="text-center mt-4 mx-3">
         <div class="mb-4">
